@@ -9,11 +9,13 @@
 
 #include <CoreServices/CoreServices.h>
 
+#define MAXPATH 1024
+
 typedef struct s_evt *p_evt;
 struct s_evt {
 	FSEventStreamEventFlags flags;
 	FSEventStreamEventId evtid;
-	char path[1024];
+	char path[MAXPATH + 1];
 	p_evt next;
 };
 static v8::Persistent<v8::FunctionTemplate> constructor_template;
@@ -69,7 +71,7 @@ namespace node_fsevents {
 			NodeFSEvents(const char *path, FSEventStreamEventId since) : ObjectWrap() {
 				first = NULL;
 				last = NULL;
-				pathname = strdup(path ? path : "/");
+				pathname = strncpy(pathname, path ? path : "/", MAXPATH);
 				sinceWhen = since;
 				pthread_mutex_init(&mutex, NULL);
 				ev_async_init(&watcher, NodeFSEvents::Poll);
@@ -112,7 +114,7 @@ namespace node_fsevents {
 				for (idx=0; idx < numEvents; idx++) {
 					item = (p_evt)malloc(sizeof(struct s_evt));
 					item->next = NULL;
-					strcpy(item->path, paths[idx]);
+					strncpy(item->path, paths[idx],MAXPATH);
 					item->flags = eventFlags[idx];
 					item->evtid = eventIds[idx];
 					if (!This->first) This->first = item;
@@ -149,7 +151,7 @@ namespace node_fsevents {
 				pthread_mutex_unlock(&(This->mutex));
 			}
 			
-			char * pathname;
+			char pathname[MAXPATH + 1];
 			CFRunLoopRef runLoop;
 			p_evt last;
 			p_evt first;

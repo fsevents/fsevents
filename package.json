@@ -1,7 +1,7 @@
 { 
 	"name" : "fsevents",
 	"description" : "Native Access to Mac OS-X FSEvents",
-	"homepage" : "http://github.com/phidelta/NodeJS-UDP-Multicast",
+	"homepage" : "https://github.com/phidelta/NodeJS-FSEvents",
 	"version" : "0.0.1",
 	"maintainers" : [ 
 		{ "name": "Philipp Dunkel", "email": "phidelta@phideltacity.net" }
@@ -9,10 +9,10 @@
 	"contributors" :[ 
 		{ "name": "Philipp Dunkel", "email": "phidelta@phideltacity.net" }
   ],
-	"bugs" : { "web" : "http://github.com/phidelta/NodeJS-UDP-Multicast" },
+	"bugs" : { "web" : "https://github.com/phidelta/NodeJS-FSEvents" },
 	"licenses" : [ { "type" : "MIT" } ],
 	"repositories" : [ 
-		{ "type" : "git", "url" : "http://github.com/phidelta/NodeJS-UDP-Multicast.git" }
+		{ "type" : "git", "url" : "https://github.com/phidelta/NodeJS-FSEvents.git" }
   ],
 	"main" : "./fsevents.js",
 	"scripts" : {
