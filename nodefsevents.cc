@@ -71,7 +71,7 @@ namespace node_fsevents {
 			NodeFSEvents(const char *path, FSEventStreamEventId since) : ObjectWrap() {
 				first = NULL;
 				last = NULL;
-				pathname = strncpy(pathname, path ? path : "/", MAXPATH);
+				strncpy(pathname, path ? path : "/", MAXPATH);
 				sinceWhen = since;
 				pthread_mutex_init(&mutex, NULL);
 				ev_async_init(&watcher, NodeFSEvents::Poll);
