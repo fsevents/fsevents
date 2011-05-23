@@ -24,7 +24,12 @@ namespace node_fsevents {
 	using namespace node;
 	class NodeFSEvents : node::ObjectWrap {
 		public:
-			
+			static v8::Handle<v8::Value> Shutdown(const v8::Arguments& args) {
+			  HandleScope scope;
+				NodeFSEvents *native = node::ObjectWrap::Unwrap<NodeFSEvents>(args.This());
+				native->Shutdown();
+			  return Undefined();
+			}
 			static void Initialize(v8::Handle<v8::Object> target) {
 				HandleScope scope;
 			  Local<FunctionTemplate> t = FunctionTemplate::New(NodeFSEvents::New);
@@ -64,11 +69,12 @@ namespace node_fsevents {
 				}
 			  NodeFSEvents *nativeobj = new NodeFSEvents(*pathname, since);
 			  nativeobj->Wrap(args.Holder());
-
+				NODE_SET_METHOD(args.Holder(), "stop", NodeFSEvents::Shutdown);
 			  return args.This();
 			}
 
 			NodeFSEvents(const char *path, FSEventStreamEventId since) : ObjectWrap() {
+				running=1;
 				first = NULL;
 				last = NULL;
 				strncpy(pathname, path ? path : "/", MAXPATH);
@@ -81,11 +87,16 @@ namespace node_fsevents {
 			}
 
 			~NodeFSEvents() {
-				CFRunLoopStop(runLoop);
-				pthread_join(thread, NULL);
-				pthread_mutex_destroy(&mutex);
-				free(this->pathname);
-				ev_async_stop(EV_DEFAULT_UC_ &watcher);
+				this->Shutdown();
+			}
+			void Shutdown() {
+				if (running) {
+					CFRunLoopStop(runLoop);
+					pthread_join(thread, NULL);
+					pthread_mutex_destroy(&mutex);
+					ev_async_stop(EV_DEFAULT_UC_ &watcher);
+				}
+				running = 0;
 			}
 			
 			static void *Run(void *data) {
@@ -151,6 +162,7 @@ namespace node_fsevents {
 				pthread_mutex_unlock(&(This->mutex));
 			}
 			
+			int running;
 			char pathname[MAXPATH + 1];
 			CFRunLoopRef runLoop;
 			p_evt last;

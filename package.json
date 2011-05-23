@@ -2,7 +2,7 @@
 	"name" : "fsevents",
 	"description" : "Native Access to Mac OS-X FSEvents",
 	"homepage" : "https://github.com/phidelta/NodeJS-FSEvents",
-	"version" : "0.0.1",
+	"version" : "0.0.2",
 	"maintainers" : [ 
 		{ "name": "Philipp Dunkel", "email": "phidelta@phideltacity.net" }
   ],
