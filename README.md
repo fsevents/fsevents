@@ -11,7 +11,6 @@ Installation
 	$	git clone https://github.com/phidelta/NodeJS-FSEvents.git fsevents
 	$ cd fsevents
 	$ node-waf configure build
-	$ ln -s ./build/default/bindings.node bindings.node
 
 OR
 

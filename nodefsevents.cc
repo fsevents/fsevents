@@ -1,7 +1,5 @@
 #include <node.h>
-#include <node_events.h>
 #include <v8.h>
-#include <ev.h>
 
 #include <stdlib.h>
 #include <string.h>

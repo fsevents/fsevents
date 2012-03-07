@@ -1,23 +1,38 @@
-{ 
-	"name" : "fsevents",
-	"description" : "Native Access to Mac OS-X FSEvents",
-	"homepage" : "https://github.com/phidelta/NodeJS-FSEvents",
-	"version" : "0.0.2",
-	"maintainers" : [ 
-		{ "name": "Philipp Dunkel", "email": "phidelta@phideltacity.net" }
+{
+  "name": "fsevents",
+  "description": "Native Access to Mac OS-X FSEvents",
+  "homepage": "https://github.com/phidelta/NodeJS-FSEvents",
+  "version": "0.0.3",
+  "maintainers": [
+    "Philipp Dunkel <phidelta@phideltacity.net>"
   ],
-	"contributors" :[ 
-		{ "name": "Philipp Dunkel", "email": "phidelta@phideltacity.net" }
+  "contributors": [
+    "Philipp Dunkel <phidelta@phideltacity.net>"
   ],
-	"bugs" : { "web" : "https://github.com/phidelta/NodeJS-FSEvents" },
-	"licenses" : [ { "type" : "MIT" } ],
-	"repositories" : [ 
-		{ "type" : "git", "url" : "https://github.com/phidelta/NodeJS-FSEvents.git" }
-  ],
-	"main" : "./fsevents.js",
-	"scripts" : {
-		"build" : "node-waf configure build",
-		"test" : "node-waf test"
+  "bugs": {
+    "url": "https://github.com/phidelta/NodeJS-FSEvents"
   },
-	"engines" : { "node" : ">=0.4.0" }
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/phidelta/NodeJS-FSEvents.git"
+    }
+  ],
+  "main": "./fsevents.js",
+  "scripts": {
+    "build": "node-waf configure build",
+    "test": "node-waf test",
+    "preinstall": "node-waf clean || (exit 0); node-waf configure build"
+  },
+  "engines": {
+    "node": "~0.6.9 | 0.7"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {}
 }
