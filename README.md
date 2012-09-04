@@ -1,3 +1,5 @@
+# DEPRECATED!!! DO NOT USE!!!
+
 Native Access to Mac OS-X FSEvents
 ==================================
 
