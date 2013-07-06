@@ -34,7 +34,7 @@ module.exports = function(path) {
     }
 
     if (info.event == 'moved') {
-      Fs.stat(info.event, function(err, stat) {
+      Fs.stat(info.path, function(err, stat) {
       if (err || !stat) {
         info.event = 'moved-out';
       } else {
