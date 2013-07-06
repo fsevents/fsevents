@@ -1,5 +1,3 @@
-# DEPRECATED!!! DO NOT USE!!!
-
 Native Access to Mac OS-X FSEvents
 ==================================
 
@@ -9,16 +7,10 @@ Native Access to Mac OS-X FSEvents
 
 Installation
 ------------
-	$ cd ~/.node_libraries
+	$ npm install -g node-gyp
 	$	git clone https://github.com/phidelta/NodeJS-FSEvents.git fsevents
 	$ cd fsevents
-	$ node-waf configure build
-
-OR
-
-	$ git clone https://github.com/phidelta/NodeJS-FSEvents.git fsevents
-	$ cd fsevents
-	$ npm install
+	$ node-gyp configure build
 
 OR SIMPLY
 
