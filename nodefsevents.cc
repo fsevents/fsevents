@@ -97,10 +97,12 @@ namespace node_fsevents {
         pthread_mutex_init(&mutex, NULL);
         uv_async_init(uv_default_loop(), &watcher, NodeFSEvents::Callback);
         watcher.data = this;
+        this->Ref();
         pthread_create(&thread, NULL, &NodeFSEvents::Run, this);
       }
 
       ~NodeFSEvents() {
+        this->Unref();
         this->Shutdown();
       }
       void Shutdown() {
@@ -163,7 +165,7 @@ namespace node_fsevents {
 
         v8::Handle<v8::Value> args[4];
         args[0] = change_sym;
-
+        This->Ref();
         item = This->first;
         while (item) {
           This->first = item->next;
@@ -176,6 +178,7 @@ namespace node_fsevents {
         }
         This->first = NULL;
         This->last = NULL;
+        This->Unref();
         pthread_mutex_unlock(&(This->mutex));
       }
 
