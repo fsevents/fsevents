@@ -1,3 +1,7 @@
+/*
+** © 2013 by Philipp Dunkel <p.dunkel@me.com>. Licensed under MIT License.
+*/
+
 #include <node.h>
 #include <uv.h>
 #include <v8.h>

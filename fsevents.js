@@ -1,3 +1,7 @@
+/*
+** © 2013 by Philipp Dunkel <p.dunkel@me.com>. Licensed under MIT License.
+*/
+
 var util = require('util');
 var events = require('events');
 var binding;
@@ -6,6 +10,8 @@ try {
 } catch(ex) {
   binding = require('./build/Debug/fswatch');
 }
+
+var Fs = require('fs');
 
 module.exports = function(path) {
   var fsevents = new FSEvents(path);
@@ -26,8 +32,21 @@ module.exports = function(path) {
     } else if (FSEvents.kFSEventStreamEventFlagItemModified & flags) {
       info.event = 'modified';
     }
-    fsevents.emit('change', path, info);
-    fsevents.emit(info.event, path, info);
+
+    if (info.event == 'moved') {
+      Fs.stat(info.event, function(err, stat) {
+      if (err || !stat) {
+        info.event = 'moved-out';
+      } else {
+        info.event = 'moved-in';
+      }
+      fsevents.emit('change', path, info);
+      fsevents.emit(info.event, path, info);
+    });
+    } else {
+      fsevents.emit('change', path, info);
+      if (info.event !== 'unknown') fsevents.emit(info.event, path, info);
+    }
   });
   return fsevents;
 };
