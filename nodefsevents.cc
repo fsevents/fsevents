@@ -70,10 +70,6 @@ namespace node_fsevents {
         return Undefined();
       }
       static v8::Handle<v8::Value> New(const v8::Arguments& args) {
-        if (!args.IsConstructCall()) {
-          return FromConstructorTemplate(constructor_template, args);
-        }
-
         HandleScope scope;
 
         if (args.Length() != 1 || !args[0]->IsString()) {
@@ -167,10 +163,12 @@ namespace node_fsevents {
         item = This->first;
         while (item) {
           This->first = item->next;
-          args[1] = v8::String::New(item->path ? item->path : "");
-          args[2] = v8::Integer::New(item->flags);
-          args[3] = v8::Integer::New(item->evtid);
-          callback->Call(This->handle_, 4, args);
+          if (!try_catch.HasCaught()) {
+            args[1] = v8::String::New(item->path ? item->path : "");
+            args[2] = v8::Integer::New(item->flags);
+            args[3] = v8::Integer::New(item->evtid);
+            callback->Call(This->handle_, 4, args);
+          }
           free(item);
           item = This->first;
         }
@@ -178,6 +176,7 @@ namespace node_fsevents {
         This->last = NULL;
         This->Ref();
         pthread_mutex_unlock(&(This->mutex));
+        if (try_catch.HasCaught()) try_catch.ReThrow();
       }
 
       int running;
@@ -194,3 +193,4 @@ namespace node_fsevents {
   }
 }
 
+NODE_MODULE(fswatch, node_fsevents::init)
