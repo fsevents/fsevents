@@ -1,4 +1,5 @@
-# Native Access to Mac OS-X FSEvents
+# FSEvents [![NPM](https://nodei.co/npm/fsevents.png)](https://nodei.co/npm/fsevents/)
+## Native Access to Mac OS-X FSEvents
 
  * [Node.js](http://nodejs.org/)
  * [Github repo](https://github.com/phidelta/NodeJS-FSEvents.git)
