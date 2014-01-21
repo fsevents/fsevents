@@ -12,6 +12,10 @@
 
 #include <CoreServices/CoreServices.h>
 
+#ifndef CUSTOMkFSEventStreamCreateFlagFileEvents
+#define CUSTOMkFSEventStreamCreateFlagFileEvents 0x00000010
+#endif
+
 #define MAXPATH 1024
 
 typedef struct s_evt *p_evt;
@@ -114,7 +118,7 @@ namespace node_fsevents {
         dir_names[0] = CFStringCreateWithCString(NULL, This->pathname, kCFStringEncodingUTF8);
         CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&dir_names, 1, NULL);
         FSEventStreamContext context = { 0, data, NULL, NULL, NULL };
-        FSEventStreamRef stream = FSEventStreamCreate(NULL, &NodeFSEvents::Event, &context, pathsToWatch, kFSEventStreamEventIdSinceNow, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents);
+        FSEventStreamRef stream = FSEventStreamCreate(NULL, &NodeFSEvents::Event, &context, pathsToWatch, kFSEventStreamEventIdSinceNow, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | CUSTOMkFSEventStreamCreateFlagFileEvents);
         This->runLoop = CFRunLoopGetCurrent();
         FSEventStreamScheduleWithRunLoop(stream, This->runLoop, kCFRunLoopDefaultMode);
         FSEventStreamStart(stream);
