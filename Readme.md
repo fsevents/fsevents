@@ -2,14 +2,14 @@
 ## Native Access to Mac OS-X FSEvents
 
  * [Node.js](http://nodejs.org/)
- * [Github repo](https://github.com/phidelta/NodeJS-FSEvents.git)
- * [Module Site](https://github.com/phidelta/NodeJS-FSEvents)
+ * [Github repo](https://github.com/pipobscure/fsevents.git)
+ * [Module Site](https://github.com/pipobscure/fsevents)
  * [NPM Page](https://npmjs.org/package/fsevents)
 
 ## Installation
 
 	$ npm install -g node-gyp
-	$	git clone https://github.com/phidelta/NodeJS-FSEvents.git fsevents
+	$	git clone https://github.com/pipobscure/fsevents.git fsevents
 	$ cd fsevents
 	$ node-gyp configure build
 
@@ -51,7 +51,7 @@ All events except *fsevent* take an *info* object as the second parameter of the
 
 ## MIT License
 
-Copyright (C) 2010-2013 Philipp Dunkel
+Copyright (C) 2010-2014 Philipp Dunkel
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
