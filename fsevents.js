@@ -91,5 +91,6 @@ function getInfo(path, flags) {
     event: getEventType(flags),
     type: getFileType(flags),
     changes: getFileChanges(flags),
+    flags: flags
   };
 }

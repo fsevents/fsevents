@@ -47,7 +47,8 @@ All events except *fsevent* take an *info* object as the second parameter of the
         "finder": false, // Has the Finder Meta-Data changed
         "access": false, // Have the access permissions changed
         "xattrs": false // Have the xAttributes changed
-      }
+      },
+      "flags": <raw-flags>
     }
 
 ## MIT License
