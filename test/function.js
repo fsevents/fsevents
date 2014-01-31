@@ -54,14 +54,14 @@ test('functionality testing', function(t) {
 
   setTimeout(function() {
     fs.writeFileSync(__dirname + '/temp/created-fsevent', 'created-fsevent');
-  }, 500);
+  }, 5000);
   setTimeout(function() {
     fs.renameSync(__dirname + '/temp/created-fsevent', __dirname + '/temp/moved-fsevent');
-  }, 1000);
+  }, 10000);
   setTimeout(function() {
     fs.unlinkSync(__dirname + '/temp/moved-fsevent');
-  }, 1500);
+  }, 15000);
   setTimeout(function() {
     fs.rmdirSync(__dirname + '/temp');
-  }, 2000);
+  }, 20000);
 });
