@@ -18,8 +18,8 @@ function getFileType(flags) {
 
 function getEventType(flags) {
   if (Constants.kFSEventStreamEventFlagItemRemoved & flags) return 'deleted';
-  if (Constants.kFSEventStreamEventFlagItemCreated & flags) return 'created';
   if (Constants.kFSEventStreamEventFlagItemRenamed & flags) return 'moved';
+  if (Constants.kFSEventStreamEventFlagItemCreated & flags) return 'created';
   if (Constants.kFSEventStreamEventFlagItemModified & flags) return 'modified';
   return 'unknown';
 }
