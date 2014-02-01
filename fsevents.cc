@@ -75,6 +75,9 @@ FSEvents::~FSEvents() {
   CFRelease(events);
 }
 
+#ifndef kFSEventStreamEventFlagItemCreated
+#define kFSEventStreamEventFlagItemCreated 0x00000100
+#endif
 
 #include "src/locking.cc"
 #include "src/async.cc"
