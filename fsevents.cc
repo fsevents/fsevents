@@ -76,7 +76,7 @@ FSEvents::~FSEvents() {
 }
 
 #ifndef kFSEventStreamEventFlagItemCreated
-#define kFSEventStreamEventFlagItemCreated 0x00000100
+#define kFSEventStreamEventFlagItemCreated 0x00000010
 #endif
 
 #include "src/locking.cc"
