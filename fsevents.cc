@@ -64,9 +64,11 @@ FSEvents::FSEvents(const char *path, NanCallback *handler): handler(handler) {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
   events = CFArrayCreateMutable(NULL, 0,  &FSEventArrayCallBacks);
+  threadloop = NULL;
   lockingStart();
 }
 FSEvents::~FSEvents() {
+  std::cout << "YIKES" << std::endl;
   lockingStop();
   delete handler;
   handler = NULL;
