@@ -3,6 +3,10 @@
 ** Licensed under MIT License.
 */
 
+#ifndef kFSEventStreamCreateFlagFileEvents
+#define kFSEventStreamCreateFlagFileEvents 0x00000010
+#endif
+
 void FSEvents::threadStart() {
   if (threadloop) return;
   pthread_create(&thread, NULL, &FSEvents::threadRun, this);
