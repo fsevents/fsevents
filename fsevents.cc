@@ -34,7 +34,6 @@ namespace fse {
     void asyncStop();
 
     // thread.cc
-    bool threadStarted;
     pthread_t thread;
     CFRunLoopRef threadloop;
     void threadStart();
