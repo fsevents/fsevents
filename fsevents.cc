@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include "src/storage.cc"
-
+using v8::String;
 namespace fse {
   class FSEvents : public node::ObjectWrap {
   public:
@@ -88,15 +88,15 @@ FSEvents::~FSEvents() {
 #include "src/methods.cc"
 
 void FSEvents::Initialize(v8::Handle<v8::Object> exports) {
-  v8::Local<v8::FunctionTemplate> tpl = v8::FunctionTemplate::New(FSEvents::New);
+  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(FSEvents::New);
   tpl->SetClassName(NanSymbol("FSEvents"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
   NODE_SET_PROTOTYPE_METHOD(tpl, "stop", FSEvents::Stop);
   NODE_SET_PROTOTYPE_METHOD(tpl, "start", FSEvents::Start);
 
-  exports->Set(v8::String::NewSymbol("Constants"), Constants());
-  exports->Set(v8::String::NewSymbol("FSEvents"), tpl->GetFunction());
+  exports->Set(NanNew<String>("Constants"), Constants());
+  exports->Set(NanNew<String>("FSEvents"), tpl->GetFunction());
 }
 
 NODE_MODULE(fse, FSEvents::Initialize)
