@@ -3,31 +3,29 @@
 ** Licensed under MIT License.
 */
 
-using v8::String;
-using v8::Integer;
 
 static v8::Local<v8::Object> Constants() {
   NanEscapableScope();
   v8::Local<v8::Object> object = NanNew<v8::Object>();
-  object->Set(NanNew<String>("kFSEventStreamEventFlagNone"), NanNew<Integer>(kFSEventStreamEventFlagNone));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagMustScanSubDirs"), NanNew<Integer>(kFSEventStreamEventFlagMustScanSubDirs));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagUserDropped"), NanNew<Integer>(kFSEventStreamEventFlagUserDropped));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagKernelDropped"), NanNew<Integer>(kFSEventStreamEventFlagKernelDropped));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagEventIdsWrapped"), NanNew<Integer>(kFSEventStreamEventFlagEventIdsWrapped));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagHistoryDone"), NanNew<Integer>(kFSEventStreamEventFlagHistoryDone));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagRootChanged"), NanNew<Integer>(kFSEventStreamEventFlagRootChanged));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagMount"), NanNew<Integer>(kFSEventStreamEventFlagMount));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagUnmount"), NanNew<Integer>(kFSEventStreamEventFlagUnmount));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemCreated"), NanNew<Integer>(kFSEventStreamEventFlagItemCreated));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemRemoved"), NanNew<Integer>(kFSEventStreamEventFlagItemRemoved));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemInodeMetaMod"), NanNew<Integer>(kFSEventStreamEventFlagItemInodeMetaMod));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemRenamed"), NanNew<Integer>(kFSEventStreamEventFlagItemRenamed));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemModified"), NanNew<Integer>(kFSEventStreamEventFlagItemModified));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemFinderInfoMod"), NanNew<Integer>(kFSEventStreamEventFlagItemFinderInfoMod));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemChangeOwner"), NanNew<Integer>(kFSEventStreamEventFlagItemChangeOwner));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemXattrMod"), NanNew<Integer>(kFSEventStreamEventFlagItemXattrMod));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemIsFile"), NanNew<Integer>(kFSEventStreamEventFlagItemIsFile));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemIsDir"), NanNew<Integer>(kFSEventStreamEventFlagItemIsDir));
-  object->Set(NanNew<String>("kFSEventStreamEventFlagItemIsSymlink"), NanNew<Integer>(kFSEventStreamEventFlagItemIsSymlink));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagNone"), NanNew<v8::Integer>(kFSEventStreamEventFlagNone));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagMustScanSubDirs"), NanNew<v8::Integer>(kFSEventStreamEventFlagMustScanSubDirs));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagUserDropped"), NanNew<v8::Integer>(kFSEventStreamEventFlagUserDropped));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagKernelDropped"), NanNew<v8::Integer>(kFSEventStreamEventFlagKernelDropped));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagEventIdsWrapped"), NanNew<v8::Integer>(kFSEventStreamEventFlagEventIdsWrapped));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagHistoryDone"), NanNew<v8::Integer>(kFSEventStreamEventFlagHistoryDone));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagRootChanged"), NanNew<v8::Integer>(kFSEventStreamEventFlagRootChanged));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagMount"), NanNew<v8::Integer>(kFSEventStreamEventFlagMount));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagUnmount"), NanNew<v8::Integer>(kFSEventStreamEventFlagUnmount));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemCreated"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemCreated));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemRemoved"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemRemoved));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemInodeMetaMod"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemInodeMetaMod));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemRenamed"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemRenamed));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemModified"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemModified));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemFinderInfoMod"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemFinderInfoMod));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemChangeOwner"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemChangeOwner));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemXattrMod"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemXattrMod));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemIsFile"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemIsFile));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemIsDir"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemIsDir));
+  object->Set(NanNew<v8::String>("kFSEventStreamEventFlagItemIsSymlink"), NanNew<v8::Integer>(kFSEventStreamEventFlagItemIsSymlink));
   return NanEscapeScope(object);
 }
