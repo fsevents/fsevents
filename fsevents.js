@@ -26,7 +26,6 @@ function watch(path) {
       fse.emit('fsevent', path, flags, id);
       var info = getInfo(path, flags);
       info.id = id;
-
       if (info.event === 'moved') {
         fs.stat(info.path, function(err, stat) {
           info.event = (err || !stat) ? 'moved-out' : 'moved-in';
@@ -73,6 +72,8 @@ function getEventType(flags) {
   if (Native.Constants.kFSEventStreamEventFlagItemRenamed & flags) return 'moved';
   if (Native.Constants.kFSEventStreamEventFlagItemCreated & flags) return 'created';
   if (Native.Constants.kFSEventStreamEventFlagItemModified & flags) return 'modified';
+  if (Native.Constants.kFSEventStreamEventFlagRootChanged & flags) return 'root-changed';
+
   return 'unknown';
 }
 
