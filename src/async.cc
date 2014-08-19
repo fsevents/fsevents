@@ -4,7 +4,7 @@
 */
 
 
-void async_propagate(uv_async_t *async, int status) {
+void async_propagate(uv_async_t *async) {
   if (!async->data) return;
   FSEvents *fse = (FSEvents *)async->data;
   CFIndex idx, cnt;
@@ -26,7 +26,7 @@ void async_propagate(uv_async_t *async, int status) {
 void FSEvents::asyncStart() {
   if (async.data == this) return;
   async.data = this;
-  uv_async_init(uv_default_loop(), &async, &async_propagate);
+  uv_async_init(uv_default_loop(), &async, (uv_async_cb) async_propagate);
 }
 
 void FSEvents::asyncTrigger() {
