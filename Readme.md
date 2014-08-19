@@ -19,11 +19,14 @@ OR SIMPLY
 
 ## Usage
 
-    var fsevents = require('fsevents');
-    var watcher = fsevents(__dirname);
-    watcher.on('fsevent', function(path, flags, id) { }); // RAW Event as emitted by OS-X
-    watcher.on('change', function(path, info) {}); // Common Event for all changes
-    // To end observation
+```js
+var fsevents = require('fsevents');
+var watcher = fsevents(__dirname);
+watcher.on('fsevent', function(path, flags, id) { }); // RAW Event as emitted by OS-X
+watcher.on('change', function(path, info) {}); // Common Event for all changes
+watcher.start() // To start observation
+watcher.stop()  // To end observation
+```
 
 ### Events
 
@@ -37,19 +40,21 @@ OR SIMPLY
 
 All events except *fsevent* take an *info* object as the second parameter of the callback. The structure of this object is:
 
-    {
-      "event": "<event-type>",
-      "id": <eventi-id>,
-      "path": "<path-that-this-is-about>",
-      "type": "<file|directory|symlink>",
-      "changes": {
-        "inode": true, // Has the iNode Meta-Information changed
-        "finder": false, // Has the Finder Meta-Data changed
-        "access": false, // Have the access permissions changed
-        "xattrs": false // Have the xAttributes changed
-      },
-      "flags": <raw-flags>
-    }
+```json
+{
+  "event": "<event-type>",
+  "id": <eventi-id>,
+  "path": "<path-that-this-is-about>",
+  "type": "<file|directory|symlink>",
+  "changes": {
+    "inode": true, // Has the iNode Meta-Information changed
+    "finder": false, // Has the Finder Meta-Data changed
+    "access": false, // Have the access permissions changed
+    "xattrs": false // Have the xAttributes changed
+  },
+  "flags": <raw-flags>
+}
+```
 
 ## MIT License
 
