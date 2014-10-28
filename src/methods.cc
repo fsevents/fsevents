@@ -20,12 +20,12 @@ NAN_METHOD(FSEvents::New) {
 
 
 
-  char* path = static_cast<char *>(NanRawString(args[0], Nan::UTF8, NULL, NULL, 0, v8::String::NO_OPTIONS));
+  char* path = static_cast<char *>(*NanUtf8String(args[0]));
   NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
-  
+
   FSEvents *fse = new FSEvents(path, callback);
   fse->Wrap(args.This());
-  
+
   NanReturnValue(args.This());
 }
 
@@ -46,6 +46,6 @@ NAN_METHOD(FSEvents::Start) {
   FSEvents* fse = node::ObjectWrap::Unwrap<FSEvents>(args.This());
   fse->asyncStart();
   fse->threadStart();
-  
+
   NanReturnValue(args.This());
 }
