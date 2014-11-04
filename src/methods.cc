@@ -17,13 +17,10 @@ void FSEvents::emitEvent(const char *path, UInt32 flags, UInt64 id) {
 NAN_METHOD(FSEvents::New) {
   NanScope();
 
-
-
-
-  char* path = static_cast<char *>(*NanUtf8String(args[0]));
+  NanUtf8String *path = new NanUtf8String(args[0]);
   NanCallback *callback = new NanCallback(args[1].As<v8::Function>());
 
-  FSEvents *fse = new FSEvents(path, callback);
+  FSEvents *fse = new FSEvents(**path, callback);
   fse->Wrap(args.This());
 
   NanReturnValue(args.This());
