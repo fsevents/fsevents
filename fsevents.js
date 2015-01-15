@@ -9,15 +9,28 @@
 var Native = require('./build/Release/fse');
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
+var inherits = require('util').inherits;
 
-inherit(Native.FSEvents, EventEmitter);
+function FSEvents(path, handler) {
+  EventEmitter.call(this);
+
+  Object.defineProperty(this, '_impl', {
+    value: new Native.FSEvents(String(path || ''), handler),
+    enumerable: false,
+    writable: false
+  });
+}
+
+inherits(FSEvents, EventEmitter);
+proxies(FSEvents, Native.FSEvents);
+
 module.exports = watch;
 module.exports.getInfo = getInfo;
 module.exports.FSEvents = Native.FSEvents;
 module.exports.Constants = Native.Constants;
 
 function watch(path) {
-  var fse = new Native.FSEvents(String(path || ''), handler);
+  var fse = new FSEvents(String(path || ''), handler);
   EventEmitter.call(fse);
   return fse;
 
@@ -40,25 +53,18 @@ function watch(path) {
   }
 }
 
-function inherit(ctor, superCtor) {
-  ctor.super_ = superCtor;
-  var proto = Object.create(superCtor.prototype, {
-    constructor: {
-      value: ctor,
-      enumerable: false,
-      writable: true,
-      configurable: true
+function proxies(ctor, target) {
+  for (var key in target.prototype) {
+    if (typeof target.prototype[key] !== 'function') {
+      continue;
     }
-  });
-  Object.keys(ctor.prototype).forEach(function(key) {
-    Object.defineProperty(proto, key, {
-      value: ctor.prototype[key],
-      writable: true,
-      enumerable: true,
-      configurable: true
-    });
-  });
-  ctor.prototype = proto;
+
+    ctor.prototype[key] = function() {
+      console.log('invoke', key);
+      this._impl[key].apply(this._impl, arguments);
+      return this;
+    }
+  }
 }
 
 function getFileType(flags) {
