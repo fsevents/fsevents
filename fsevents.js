@@ -35,7 +35,7 @@ function watch(path) {
   return fse;
 
   function handler(path, flags, id) {
-    setImmediate(function() {
+    (global.setImmediate || process.nextTick)(function() {
       fse.emit('fsevent', path, flags, id);
       var info = getInfo(path, flags);
       info.id = id;
