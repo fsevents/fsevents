@@ -62,7 +62,6 @@ function proxies(ctor, target) {
     }
 
     ctor.prototype[key] = function() {
-      console.log('invoke', key);
       this._impl[key].apply(this._impl, arguments);
       return this;
     }
