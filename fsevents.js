@@ -56,17 +56,14 @@ function watch(path) {
 }
 
 function proxies(ctor, target) {
-  for (var key in target.prototype) {
-    if (typeof target.prototype[key] !== 'function') {
-      continue;
-    }
-
+  Object.keys(target.prototype).filter(function(key) {
+    return typeof target.prototype[key] === 'function';
+  }).forEach(function(key) {
     ctor.prototype[key] = function() {
-      console.log('invoke', key);
       this._impl[key].apply(this._impl, arguments);
       return this;
     }
-  }
+  });
 }
 
 function getFileType(flags) {
