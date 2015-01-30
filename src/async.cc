@@ -15,6 +15,7 @@ void async_propagate(uv_async_t *async) {
   cnt = CFArrayGetCount(fse->events);
   for (idx=0; idx<cnt; idx++) {
     event = (fse_event *)CFArrayGetValueAtIndex(fse->events, idx);
+    if (event == NULL) continue;
     pathptr = CFStringGetCStringPtr(event->path, kCFStringEncodingUTF8);
     if (!pathptr) CFStringGetCString(event->path, pathbuf, 1024, kCFStringEncodingUTF8);
     fse->emitEvent(pathptr ? pathptr : pathbuf, event->flags, event->id);

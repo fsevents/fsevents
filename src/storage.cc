@@ -11,6 +11,7 @@ struct fse_event {
 typedef struct fse_event fse_event;
 
 const void * FSEventRetain(CFAllocatorRef allocator, const void * ptr) {
+  if (ptr == NULL) return NULL;
   fse_event * orig = (fse_event * ) ptr;
   fse_event * copy = (fse_event * ) CFAllocatorAllocate(allocator, sizeof(fse_event), 0);
   copy->id = orig->id;
@@ -20,6 +21,7 @@ const void * FSEventRetain(CFAllocatorRef allocator, const void * ptr) {
   return copy;
 }
 void FSEventRelease(CFAllocatorRef allocator, const void * ptr) {
+  if (ptr == NULL) return;
   fse_event * evt = (fse_event * ) ptr;
   CFRelease(evt->path);
   CFAllocatorDeallocate(allocator, evt);
