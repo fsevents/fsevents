@@ -4,7 +4,8 @@
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
-    "nan": "~1.5.0"
+    "nan": "~1.5.0",
+    "node-pre-gyp": "^0.5.31"
   },
   "os": [
     "darwin"
@@ -13,8 +14,15 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "install": "node-gyp rebuild",
+    "install": "node-pre-gyp install --fallback-to-build",
     "test": "export PATH=$PATH:`pwd`/node_nodules/.bin/ && tap ./test"
+  },
+  "binary": {
+    "module_name" : "fse",
+    "module_path" : "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
+    "remote_path" : "./v{version}/",
+    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
+    "host"        : "https://fsevents-binary.s3.amazonaws.com"
   },
   "repository": {
     "type": "git",
@@ -31,6 +39,9 @@
     "url": "https://github.com/pipobscure/fsevents/issues"
   },
   "homepage": "https://github.com/pipobscure/fsevents",
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "devDependencies": {
     "tap": "~0.4.8"
   }

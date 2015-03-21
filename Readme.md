@@ -8,10 +8,10 @@
 
 ## Installation
 
-	$ npm install -g node-gyp
+	$ npm install -g node-pre-gyp
 	$	git clone https://github.com/pipobscure/fsevents.git fsevents
 	$ cd fsevents
-	$ node-gyp configure build
+	$ node-pre-gyp configure build
 
 OR SIMPLY
 
