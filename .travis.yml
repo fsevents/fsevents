@@ -1,7 +1,4 @@
-language: c
-
-os:
-  - osx
+language: objective-c
 
 env:
   - NODE_VERSION="v0.10"
