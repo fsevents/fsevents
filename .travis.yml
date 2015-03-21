@@ -59,7 +59,6 @@ before_script:
 
   - if [[ $TRAVIS_BRANCH == `git describe --tags --always HEAD` ]]; then PUBLISH_BINARY=true; fi;       # a
   - if test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then PUBLISH_BINARY=true; fi; # b
-  - if [[ NODE_VERSION == "v0.11" ]]; then PUBLISH_BINARY=false; fi;                                    # c
 
   # package & publish
   # ------------------------
