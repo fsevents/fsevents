@@ -53,7 +53,6 @@ before_script:
   #
   # a) we are building a tag
   # b) we put [publish binary] in the commit message
-  # c) we are not publishing if node 0.11 as it shares the same NODE_MODULE_VERSION as 12
 
   - PUBLISH_BINARY=false
 
