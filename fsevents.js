@@ -15,6 +15,10 @@
 'use strict';
 
 module.exports = watch;
+module.exports.getEventType = getEventType;
+module.exports.getFileChanges = getFileChanges;
+module.exports.getFileType = getFileType;
+module.exports.getInfo = getInfo;
 
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
