@@ -13,7 +13,6 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "install": "node-gyp rebuild",
     "test": "export PATH=$PATH:`pwd`/node_nodules/.bin/ && tap ./test"
   },
   "repository": {
