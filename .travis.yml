@@ -1,23 +1,8 @@
-language: objective-c
+language: node_js
 
-env:
-  - NODE_VERSION="v0.10"
-  - NODE_VERSION="v0.11"
-  - NODE_VERSION="iojs-v1.0"
+sudo: false
 
-before_install:
-  - echo $TRAVIS_OS_NAME
-  - export PATH=./node_modules/.bin/:$PATH
-  - rm -rf ~/.nvm && git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
-  - source ~/.nvm/nvm.sh
-  - nvm install $NODE_VERSION
-  - nvm use $NODE_VERSION
-  - node --version
-  - npm --version
-  - nvm --version
-
-install:
-  - npm install
-
-script:
-  - npm test
+node_js:
+  - "0.12"
+  - "0.10"
+  - "iojs"
