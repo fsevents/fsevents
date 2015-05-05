@@ -4,6 +4,7 @@ env:
   - NODE_VERSION="v0.10"
   - NODE_VERSION="v0.12"
   - NODE_VERSION="iojs-v1.0"
+  - NODE_VERSION="iojs-v2.0"
 
 before_install:
   - echo $TRAVIS_OS_NAME
