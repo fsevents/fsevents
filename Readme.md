@@ -40,7 +40,7 @@ watcher.stop()  // To end observation
 
 All events except *fsevent* take an *info* object as the second parameter of the callback. The structure of this object is:
 
-```json
+```js
 {
   "event": "<event-type>",
   "id": <eventi-id>,
