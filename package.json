@@ -13,8 +13,7 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "install": "node-gyp rebuild",
-    "test": "export PATH=$PATH:`pwd`/node_nodules/.bin/ && tap ./test"
+    "test": "tap ./test"
   },
   "repository": {
     "type": "git",
@@ -26,7 +25,6 @@
   ],
   "author": "Philipp Dunkel <pip@pipobscure.com>",
   "license": "MIT",
-  "gypfile": true,
   "bugs": {
     "url": "https://github.com/strongloop/fsevents/issues"
   },
