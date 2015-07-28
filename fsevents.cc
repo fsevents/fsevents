@@ -10,6 +10,7 @@
 #include "CoreFoundation/CoreFoundation.h"
 #include "CoreServices/CoreServices.h"
 #include <iostream>
+#include <vector>
 
 #include "src/storage.cc"
 namespace fse {
@@ -45,7 +46,7 @@ namespace fse {
 
     // Common
     CFArrayRef paths;
-    CFMutableArrayRef events;
+    std::vector<fse_event*> events;
     static void Initialize(v8::Handle<v8::Object> exports);
 
     // methods.cc - exposed
@@ -61,7 +62,6 @@ using namespace fse;
 FSEvents::FSEvents(const char *path, NanCallback *handler): handler(handler) {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
-  events = CFArrayCreateMutable(NULL, 0,  &FSEventArrayCallBacks);
   threadloop = NULL;
   lockingStart();
 }
@@ -72,7 +72,6 @@ FSEvents::~FSEvents() {
   handler = NULL;
 
   CFRelease(paths);
-  CFRelease(events);
 }
 
 #ifndef kFSEventStreamEventFlagItemCreated
