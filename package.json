@@ -4,7 +4,7 @@
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
-    "nan": "^1.8.0"
+    "nan": "^2.0.0"
   },
   "os": [
     "darwin"
