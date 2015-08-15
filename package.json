@@ -22,7 +22,7 @@
     "module_path" : "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
     "remote_path" : "./v{version}/",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host"        : "https://fsevents-binary.s3.amazonaws.com"
+    "host"        : "https://fsevents-binaries.s3-us-west-2.amazonaws.com"
   },
   "repository": {
     "type": "git",
