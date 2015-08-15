@@ -1,11 +1,11 @@
 {
   "name": "fsevents",
-  "version": "0.3.5",
+  "version": "0.3.8",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
-    "nan": "~1.5.0",
-    "node-pre-gyp": "^0.6.4"
+    "nan": "^2.0.2",
+    "node-pre-gyp": "^0.6.8"
   },
   "os": [
     "darwin"
@@ -15,7 +15,7 @@
   },
   "scripts": {
     "install": "node-pre-gyp install --fallback-to-build",
-    "test": "export PATH=$PATH:`pwd`/node_nodules/.bin/ && tap ./test"
+    "test": "tap ./test"
   },
   "binary": {
     "module_name" : "fse",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pipobscure/fsevents.git"
+    "url": "https://github.com/strongloop/fsevents.git"
   },
   "keywords": [
     "fsevents",
@@ -34,14 +34,13 @@
   ],
   "author": "Philipp Dunkel <pip@pipobscure.com>",
   "license": "MIT",
-  "gypfile": true,
   "bugs": {
-    "url": "https://github.com/pipobscure/fsevents/issues"
+    "url": "https://github.com/strongloop/fsevents/issues"
   },
-  "homepage": "https://github.com/pipobscure/fsevents",
   "bundledDependencies": [
     "node-pre-gyp"
   ],
+  "homepage": "https://github.com/strongloop/fsevents",
   "devDependencies": {
     "tap": "~0.4.8"
   }
