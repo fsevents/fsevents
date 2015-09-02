@@ -6,7 +6,10 @@
 /* jshint node:true */
 'use strict';
 
-var Native = require('./build/Release/fse');
+var path = require('path');
+var binary = require('node-pre-gyp');
+var Native = require(binary.find(path.join(__dirname, 'package.json')));
+
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
 var inherits = require('util').inherits;

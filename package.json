@@ -4,7 +4,8 @@
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
-    "nan": "^2.0.2"
+    "nan": "^2.0.2",
+    "node-pre-gyp": "^0.6.8"
   },
   "os": [
     "darwin"
@@ -13,7 +14,15 @@
     "node": ">=0.8.0"
   },
   "scripts": {
+    "install": "node-pre-gyp install --fallback-to-build",
     "test": "tap ./test"
+  },
+  "binary": {
+    "module_name" : "fse",
+    "module_path" : "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
+    "remote_path" : "./v{version}/",
+    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
+    "host"        : "https://fsevents-binaries.s3-us-west-2.amazonaws.com"
   },
   "repository": {
     "type": "git",
@@ -28,6 +37,9 @@
   "bugs": {
     "url": "https://github.com/strongloop/fsevents/issues"
   },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "homepage": "https://github.com/strongloop/fsevents",
   "devDependencies": {
     "tap": "~0.4.8"

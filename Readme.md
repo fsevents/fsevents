@@ -11,7 +11,7 @@
 	$ npm install -g node-gyp
 	$	git clone https://github.com/strongloop/fsevents.git fsevents
 	$ cd fsevents
-	$ node-gyp configure build
+	$ node-pre-gyp configure build
 
 OR SIMPLY
 
