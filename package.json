@@ -1,6 +1,6 @@
 {
   "name": "fsevents",
-  "version": "0.3.8",
+  "version": "1.0.0",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
@@ -18,11 +18,11 @@
     "test": "tap ./test"
   },
   "binary": {
-    "module_name" : "fse",
-    "module_path" : "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
-    "remote_path" : "./v{version}/",
+    "module_name": "fse",
+    "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
+    "remote_path": "./v{version}/",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host"        : "https://fsevents-binaries.s3-us-west-2.amazonaws.com"
+    "host": "https://fsevents-binaries.s3-us-west-2.amazonaws.com"
   },
   "repository": {
     "type": "git",
