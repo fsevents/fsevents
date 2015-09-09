@@ -10,6 +10,7 @@ env:
     - NODE_VERSION="iojs-v1"
     - NODE_VERSION="iojs-v2"
     - NODE_VERSION="iojs-v3"
+    - NODE_VERSION="v4"
 
 before_install:
 
