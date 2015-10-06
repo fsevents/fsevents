@@ -5,7 +5,7 @@
   "main": "fsevents.js",
   "dependencies": {
     "nan": "^2.0.2",
-    "node-pre-gyp": "^0.6.11"
+    "node-pre-gyp": "^0.6.12"
   },
   "os": [
     "darwin"
