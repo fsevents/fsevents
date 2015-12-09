@@ -1,10 +1,11 @@
 # FSEvents [![NPM](https://nodei.co/npm/fsevents.png)](https://nodei.co/npm/fsevents/)
-## Native Access to Mac OS-X FSEvents
 
- * [Node.js](http://nodejs.org/)
- * [Github repo](https://github.com/strongloop/fsevents.git)
- * [Module Site](https://github.com/strongloop/fsevents)
- * [NPM Page](https://npmjs.org/package/fsevents)
+Native access to OS X FSEvents via [node.js](http://nodejs.org/).
+
+The FSEvents API in OS X allows applications to register for notifications of changes to a given directory tree. It is very fast and lightweight alternative to kqueue. 
+
+* [Module Site & GitHub](https://github.com/strongloop/fsevents)
+* [NPM Page](https://npmjs.org/package/fsevents)
 
 ## Installation
 
