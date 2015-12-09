@@ -2,7 +2,9 @@
 
 Native access to OS X FSEvents via [node.js](http://nodejs.org/).
 
-The FSEvents API in OS X allows applications to register for notifications of changes to a given directory tree. It is very fast and lightweight alternative to kqueue. 
+The FSEvents API in OS X allows applications to register for notifications of changes to a given directory tree. It is very fast and lightweight alternative to kqueue.
+
+This is a low-level library. Check out for [Chokidar](https://www.npmjs.com/package/chokidar) if you need a solid file watching package that's using FSEvents.
 
 * [Module Site & GitHub](https://github.com/strongloop/fsevents)
 * [NPM Page](https://npmjs.org/package/fsevents)
