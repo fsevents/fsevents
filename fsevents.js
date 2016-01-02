@@ -7,8 +7,8 @@
 'use strict';
 
 var path = require('path');
-var binary = require('node-pre-gyp');
-var Native = require(binary.find(path.join(__dirname, 'package.json')));
+var binary = require('pre-gyp-find');
+var Native = binary('fse');
 
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
