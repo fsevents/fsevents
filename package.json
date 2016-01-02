@@ -10,7 +10,10 @@
 =======
     "nan": "^2.0.2",
     "pre-gyp-find": "^0.6.0"
+<<<<<<< HEAD
 >>>>>>> strongloop/fix-93
+=======
+>>>>>>> origin/fix-93
   },
   "os": [
     "darwin"
