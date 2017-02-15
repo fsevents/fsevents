@@ -6,10 +6,10 @@
 /* jshint node:true */
 'use strict';
 
-if(process.platform !== 'darwin') {
-  var err = new Error("Cannot find module 'fsevents'")
-  err.code = 'MODULE_NOT_FOUND'
-  throw err
+if (process.platform !== 'darwin') {
+  var err = new Error('Cannot find module \'fsevents\'');
+  err.code = 'MODULE_NOT_FOUND';
+  throw err;
 }
 
 
