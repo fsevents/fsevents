@@ -1,21 +1,18 @@
 {
   "name": "fsevents",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
     "nan": "^2.3.0",
     "node-pre-gyp": "^0.6.29"
   },
-  "os": [
-    "darwin"
-  ],
   "engines": {
     "node": ">=0.8.0"
   },
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build",
-    "prepublish": "if [ $(npm -v | head -c 1) -lt 3 ]; then exit 1; fi && npm dedupe",
+    "install": "node -e \"process.platform==='darwin' && require('child_process').execSync('node-pre-gyp install --fallback-to-build')\"",
+    "prepublish": "node -e \"process.platform==='darwin' && require('child_process').execSync('if [ $(npm -v | head -c 1) -lt 3 ]; then exit 1; fi && npm dedupe')\"",
     "test": "tap ./test"
   },
   "binary": {

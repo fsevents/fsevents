@@ -6,6 +6,13 @@
 /* jshint node:true */
 'use strict';
 
+if(process.platform !== 'darwin') {
+  var err = new Error("Cannot find module 'fsevents'")
+  err.code = 'MODULE_NOT_FOUND'
+  throw err
+}
+
+
 var path = require('path');
 var binary = require('node-pre-gyp');
 var Native = require(binary.find(path.join(__dirname, 'package.json')));
