@@ -1,5 +1,7 @@
 if (process.platform === 'darwin') {
   var spawn = require('child_process').spawn;
-  var child = spawn('node-pre-gyp', ['install', '--fallback-to-build'], {stdio: 'inherit'});
-  child.on('close', function(code) {process.exit(code)});
+  var args = ['install', '--fallback-to-build'];
+  var options = {stdio: 'inherit'};
+  var child = spawn('node-pre-gyp', args, options);
+  child.on('close', process.exit);
 }
