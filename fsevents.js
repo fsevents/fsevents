@@ -6,12 +6,8 @@
 /* jshint node:true */
 'use strict';
 
-if (process.platform !== 'darwin') {
-  var err = new Error('Cannot find module \'fsevents\'');
-  err.code = 'MODULE_NOT_FOUND';
-  throw err;
-}
-
+if (process.platform !== 'darwin')
+  throw new Error('Module \'fsevents\' is not compatible with platform \'' + process.platform + '\'');
 
 var path = require('path');
 var binary = require('node-pre-gyp');
