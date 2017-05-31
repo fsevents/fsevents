@@ -35,7 +35,7 @@ before_install:
   - source ~/.nvm/nvm.sh
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
-  - npm install -g npm@latest
+  - if [[ ($NODE_VERSION == "v4") || ($NODE_VERSION == "v0"*) || ($NODE_VERSION == "iojs"*) ]]; then npm install -g npm@3; fi;
   - node --version
   - npm --version
   - nvm --version
