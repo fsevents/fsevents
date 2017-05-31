@@ -44,7 +44,7 @@ before_install:
   # ------------------------
 
   - npm install node-gyp -g
-  - npm install aws-sdk
+  - npm install aws-sdk node-pre-gyp nan
 
 install:
 
