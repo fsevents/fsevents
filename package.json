@@ -16,7 +16,8 @@
   "scripts": {
     "install": "node install",
     "prepublish": "if [ $(npm -v | head -c 1) -lt 3 ]; then exit 1; fi && npm dedupe",
-    "test": "tap ./test"
+    "test": "tap ./test",
+    "node-pre-gyp": "node-pre-gyp"
   },
   "binary": {
     "module_name": "fse",

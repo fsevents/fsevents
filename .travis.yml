@@ -32,7 +32,7 @@ before_install:
   - source ~/.nvm/nvm.sh
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
-  - npm install -g npm@3
+  - npm install -g npm@4
   - node --version
   - npm --version
   - nvm --version
@@ -40,7 +40,7 @@ before_install:
   # publish dependencies
   # ------------------------
 
-  - npm install node-gyp node-pre-gyp -g
+  - npm install node-gyp -g
   - npm install aws-sdk
 
 install:
@@ -66,12 +66,12 @@ before_script:
   # package & publish
   # ------------------------
 
-  - if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package publish; fi;
+  - if [[ $PUBLISH_BINARY == true ]]; then npm run node-pre-gyp package publish; fi;
 
   # clean-up
   # ------------------------
 
-  - node-pre-gyp clean
+  - npm run node-pre-gyp clean
   - node-gyp clean
 
 script:
@@ -84,18 +84,18 @@ script:
   - INSTALL_RESULT=0
   - if [[ $PUBLISH_BINARY == true ]]; then INSTALL_RESULT=$(npm install --fallback-to-build=false > /dev/null)$? || true; fi;
 
-  - node-pre-gyp clean
+  - npm run node-pre-gyp clean
 
   # failure?
   # ------------------------
   # if install returned non zero (errored) then we first unpublish and then
   # call false so travis will bail at this line.
 
-  - if [[ $INSTALL_RESULT != 0 ]]; then node-pre-gyp unpublish; fi;
+  - if [[ $INSTALL_RESULT != 0 ]]; then npm run node-pre-gyp unpublish; fi;
   - if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";false; fi;
 
 after_success:
 
   # display all published binaries
 
- - node-pre-gyp info
+ - npm run node-pre-gyp info
