@@ -35,7 +35,7 @@ before_install:
   - source ~/.nvm/nvm.sh
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
-  - npm install -g npm@4.2.0
+  - npm install -g npm@3
   - node --version
   - npm --version
   - nvm --version
@@ -43,8 +43,7 @@ before_install:
   # publish dependencies
   # ------------------------
 
-  - npm install node-gyp -g
-  - npm install node-pre-gyp -g
+  - npm install node-gyp node-pre-gyp -g
   - npm install aws-sdk
 
 install:
