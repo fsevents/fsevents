@@ -32,7 +32,7 @@ before_install:
   - source ~/.nvm/nvm.sh
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
-  - npm install -g npm@4
+  - npm install -g npm@3
   - node --version
   - npm --version
   - nvm --version
