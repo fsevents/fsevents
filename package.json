@@ -7,9 +7,6 @@
     "nan": "^2.3.0",
     "node-pre-gyp": "^0.6.36"
   },
-  "os": [
-    "darwin"
-  ],
   "engines": {
     "node": ">=0.8.0"
   },
