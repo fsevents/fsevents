@@ -11,7 +11,7 @@ void FSEvents::emitEvent(const char *path, UInt32 flags, UInt64 id) {
     Nan::New<v8::Number>(flags),
     Nan::New<v8::Number>(id)
   };
-  handler->Call(3, argv);
+  handler->Call(3, argv, &async_resource);
 }
 
 NAN_METHOD(FSEvents::New) {
