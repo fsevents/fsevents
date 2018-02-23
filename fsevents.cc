@@ -41,6 +41,7 @@ namespace fse {
     void threadStop();
 
     // methods.cc - internal
+    Nan::AsyncResource async_resource;
     Nan::Callback *handler;
     void emitEvent(const char *path, UInt32 flags, UInt64 id);
 
@@ -59,7 +60,8 @@ namespace fse {
 
 using namespace fse;
 
-FSEvents::FSEvents(const char *path, Nan::Callback *handler): handler(handler) {
+FSEvents::FSEvents(const char *path, Nan::Callback *handler)
+    : async_resource("fsevents:FSEvents"), handler(handler) {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
   threadloop = NULL;
