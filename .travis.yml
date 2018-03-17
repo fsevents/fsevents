@@ -11,7 +11,6 @@ env:
     - NODE_VERSION="v6"
     - NODE_VERSION="v5"
     - NODE_VERSION="v4"
-    - NODE_VERSION="v0.12"
     - NODE_VERSION="v0.10"
 
 before_install:
