@@ -16,7 +16,7 @@
 namespace fse {
   class FSEvents : public node::ObjectWrap {
   public:
-    FSEvents(const char *path, Nan::Callback *handler);
+    FSEvents(const char *path);
     ~FSEvents();
 
     // locking.cc
@@ -42,7 +42,6 @@ namespace fse {
 
     // methods.cc - internal
     Nan::AsyncResource async_resource;
-    Nan::Callback *handler;
     void emitEvent(const char *path, UInt32 flags, UInt64 id);
 
     // Common
@@ -60,18 +59,15 @@ namespace fse {
 
 using namespace fse;
 
-FSEvents::FSEvents(const char *path, Nan::Callback *handler)
-    : async_resource("fsevents:FSEvents"), handler(handler) {
+FSEvents::FSEvents(const char *path)
+   : async_resource("fsevents:FSEvents") {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
   threadloop = NULL;
   lockingStart();
 }
 FSEvents::~FSEvents() {
-  std::cout << "YIKES" << std::endl;
   lockingStop();
-  delete handler;
-  handler = NULL;
 
   CFRelease(paths);
 }
