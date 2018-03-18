@@ -4,22 +4,23 @@
 */
 
 void FSEvents::emitEvent(const char *path, UInt32 flags, UInt64 id) {
-  if (!handler) return;
   Nan::HandleScope handle_scope;
+  v8::Local<v8::Object> object = handle();
+  Nan::Callback handler(object->Get(object->CreationContext(), Nan::New<v8::String>("handler").ToLocalChecked()).ToLocalChecked().As<v8::Function>());
   v8::Local<v8::Value> argv[] = {
     Nan::New<v8::String>(path).ToLocalChecked(),
     Nan::New<v8::Number>(flags),
     Nan::New<v8::Number>(id)
   };
-  handler->Call(3, argv, &async_resource);
+  handler.Call(3, argv, &async_resource);
 }
 
 NAN_METHOD(FSEvents::New) {
-  Nan::Utf8String *path = new Nan::Utf8String(info[0]);
-  Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+  Nan::Utf8String path(info[0]);
 
-  FSEvents *fse = new FSEvents(**path, callback);
+  FSEvents *fse = new FSEvents(*path);
   fse->Wrap(info.This());
+  info.This()->Set(info.This()->CreationContext(), Nan::New<v8::String>("handler").ToLocalChecked(), info[1].As<v8::Function>());
 
   info.GetReturnValue().Set(info.This());
 }
