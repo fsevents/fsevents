@@ -20,7 +20,7 @@ namespace fse {
     ~FSEvents();
 
     // locking.cc
-    bool lockStarted;
+    bool lockStarted = false;
     pthread_mutex_t lockmutex;
     void lockingStart();
     void lock();
