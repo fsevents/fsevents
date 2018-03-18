@@ -14,13 +14,13 @@
 
 #include "src/storage.cc"
 namespace fse {
-  class FSEvents : public node::ObjectWrap {
+  class FSEvents : public Nan::ObjectWrap {
   public:
-    FSEvents(const char *path);
+    explicit FSEvents(const char *path);
     ~FSEvents();
 
     // locking.cc
-    bool lockStarted = false;
+    bool lockStarted;
     pthread_mutex_t lockmutex;
     void lockingStart();
     void lock();
@@ -60,7 +60,7 @@ namespace fse {
 using namespace fse;
 
 FSEvents::FSEvents(const char *path)
-   : async_resource("fsevents:FSEvents") {
+   : async_resource("fsevents:FSEvents"), lockStarted(false) {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
   threadloop = NULL;
