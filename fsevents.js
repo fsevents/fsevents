@@ -35,15 +35,13 @@ module.exports.getInfo = getInfo;
 module.exports.FSEvents = Native.FSEvents;
 module.exports.Constants = Native.Constants;
 
-var defer = global.setImmediate || process.nextTick;
-
 function watch(path) {
   var fse = new FSEvents(String(path || ''), handler);
   EventEmitter.call(fse);
   return fse;
 
   function handler(path, flags, id) {
-    defer(function() {
+    setImmediate(function() {
       fse.emit('fsevent', path, flags, id);
       var info = getInfo(path, flags);
       info.id = id;
