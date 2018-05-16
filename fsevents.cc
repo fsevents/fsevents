@@ -19,13 +19,7 @@ namespace fse {
     explicit FSEvents(const char *path);
     ~FSEvents();
 
-    // locking.cc
-    bool lockStarted;
-    pthread_mutex_t lockmutex;
-    void lockingStart();
-    void lock();
-    void unlock();
-    void lockingStop();
+    uv_mutex_t mutex;
 
     // async.cc
     uv_async_t async;
@@ -60,23 +54,21 @@ namespace fse {
 using namespace fse;
 
 FSEvents::FSEvents(const char *path)
-   : async_resource("fsevents:FSEvents"), lockStarted(false) {
+   : async_resource("fsevents:FSEvents") {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
   threadloop = NULL;
-  lockingStart();
+  if (uv_mutex_init(&mutex)) abort();
 }
 FSEvents::~FSEvents() {
-  lockingStop();
-
   CFRelease(paths);
+  uv_mutex_destroy(&mutex);
 }
 
 #ifndef kFSEventStreamEventFlagItemCreated
 #define kFSEventStreamEventFlagItemCreated 0x00000010
 #endif
 
-#include "src/locking.cc"
 #include "src/async.cc"
 #include "src/thread.cc"
 #include "src/constants.cc"

@@ -36,7 +36,7 @@ void FSEvents::threadStart() {
 void HandleStreamEvents(ConstFSEventStreamRef stream, void *ctx, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[]) {
   FSEvents * fse = (FSEvents *)ctx;
   size_t idx;
-  fse->lock();
+  uv_mutex_lock(&fse->mutex);
   for (idx=0; idx < numEvents; idx++) {
     fse_event *event = new fse_event(
         (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx),
@@ -46,7 +46,7 @@ void HandleStreamEvents(ConstFSEventStreamRef stream, void *ctx, size_t numEvent
     fse->events.push_back(event);
   }
   fse->asyncTrigger();
-  fse->unlock();
+  uv_mutex_unlock(&fse->mutex);
 }
 
 void *FSEvents::threadRun(void *ctx) {
