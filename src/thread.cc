@@ -30,7 +30,7 @@
 
 void FSEvents::threadStart() {
   if (threadloop) return;
-  pthread_create(&thread, NULL, &FSEvents::threadRun, this);
+  if (uv_thread_create(&thread, &FSEvents::threadRun, this)) abort();
 }
 
 void HandleStreamEvents(ConstFSEventStreamRef stream, void *ctx, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[]) {
@@ -49,7 +49,7 @@ void HandleStreamEvents(ConstFSEventStreamRef stream, void *ctx, size_t numEvent
   uv_mutex_unlock(&fse->mutex);
 }
 
-void *FSEvents::threadRun(void *ctx) {
+void FSEvents::threadRun(void *ctx) {
   FSEvents *fse = (FSEvents*)ctx;
   FSEventStreamContext context = { 0, ctx, NULL, NULL, NULL };
   fse->threadloop = CFRunLoopGetCurrent();
@@ -62,11 +62,10 @@ void *FSEvents::threadRun(void *ctx) {
   FSEventStreamInvalidate(stream);
   FSEventStreamRelease(stream);
   fse->threadloop = NULL;
-  return NULL;
 }
 
 void FSEvents::threadStop() {
   if (!threadloop) return;
   CFRunLoopStop(threadloop);
-  pthread_join(thread, NULL);
+  if (uv_thread_join(&thread)) abort();
 }

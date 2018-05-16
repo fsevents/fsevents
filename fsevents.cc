@@ -6,7 +6,6 @@
 #include "nan.h"
 #include "uv.h"
 #include "v8.h"
-#include "pthread.h"
 #include "CoreFoundation/CoreFoundation.h"
 #include "CoreServices/CoreServices.h"
 #include <iostream>
@@ -28,10 +27,10 @@ namespace fse {
     void asyncStop();
 
     // thread.cc
-    pthread_t thread;
+    uv_thread_t thread;
     CFRunLoopRef threadloop;
     void threadStart();
-    static void *threadRun(void *ctx);
+    static void threadRun(void *ctx);
     void threadStop();
 
     // methods.cc - internal
