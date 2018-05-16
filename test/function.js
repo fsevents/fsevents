@@ -52,7 +52,11 @@ test('functionality testing', function(t) {
         t.ok(path.basename(name) === 'created-fsevent', 'file moved out: ' + path.basename(name));
         break;
       case 'moved-in':
-        t.ok(path.basename(name) === 'moved-fsevent', 'file moved in: ' + path.basename(name));
+        // There appears to be a race condition when the test is run in quick
+        // succession where the reported path is either the old filename or
+        // the new filename.
+        t.ok(path.basename(name) === 'created-fsevent' ||
+             path.basename(name) === 'moved-fsevent', 'file moved in: ' + path.basename(name));
         break;
       case 'deleted':
         t.ok(path.basename(name) === 'moved-fsevent', 'file deleted: ' + path.basename(name));
