@@ -84,7 +84,7 @@
 #define kFSEventStreamEventFlagItemIsSymlink 0x00040000
 #endif
 
-static Napi::Object Constants() {
+static Napi::Object Constants(Napi::Env env) {
   Napi::Object object = Napi::Object::New(env);
   object.Set(Napi::String::New(env, "kFSEventStreamEventFlagNone"), Napi::Number::New(env, kFSEventStreamEventFlagNone));
   object.Set(Napi::String::New(env, "kFSEventStreamEventFlagMustScanSubDirs"), Napi::Number::New(env, kFSEventStreamEventFlagMustScanSubDirs));
