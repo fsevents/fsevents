@@ -4,41 +4,41 @@
 */
 
 void FSEvents::emitEvent(const char *path, UInt32 flags, UInt64 id) {
-  Nan::HandleScope handle_scope;
-  v8::Local<v8::Object> object = handle();
-  v8::Local<v8::Value> key = Nan::New<v8::String>("handler").ToLocalChecked();
-  Nan::Callback handler(Nan::To<v8::Function>(Nan::Get(object, key).ToLocalChecked()).ToLocalChecked());
-  v8::Local<v8::Value> argv[] = {
-    Nan::New<v8::String>(path).ToLocalChecked(),
-    Nan::New<v8::Number>(flags),
-    Nan::New<v8::Number>(id)
+  Napi::HandleScope handle_scope(env);
+  Napi::Object object = handle();
+  Napi::Value key = Napi::String::New(env, "handler");
+  Napi::FunctionReference handler((object).Get(key.To<Napi::Function>()));
+  Napi::Value argv[] = {
+    Napi::String::New(env, path),
+    Napi::Number::New(env, flags),
+    Napi::Number::New(env, id)
   };
   handler.Call(3, argv, &async_resource);
 }
 
-NAN_METHOD(FSEvents::New) {
-  Nan::Utf8String path(info[0]);
+Napi::Value FSEvents::New(const Napi::CallbackInfo& info) {
+  std::string path = info[0].As<Napi::String>();
 
   FSEvents *fse = new FSEvents(*path);
   fse->Wrap(info.This());
-  Nan::Set(info.This(), Nan::New<v8::String>("handler").ToLocalChecked(), info[1]);
+  (info.This()).Set(Napi::String::New(env, "handler"), info[1]);
 
-  info.GetReturnValue().Set(info.This());
+  return info.This();
 }
 
-NAN_METHOD(FSEvents::Stop) {
-  FSEvents* fse = Nan::ObjectWrap::Unwrap<FSEvents>(info.This());
+Napi::Value FSEvents::Stop(const Napi::CallbackInfo& info) {
+  FSEvents* fse = this;
 
   fse->threadStop();
   fse->asyncStop();
 
-  info.GetReturnValue().Set(info.This());
+  return info.This();
 }
 
-NAN_METHOD(FSEvents::Start) {
-  FSEvents* fse = Nan::ObjectWrap::Unwrap<FSEvents>(info.This());
+Napi::Value FSEvents::Start(const Napi::CallbackInfo& info) {
+  FSEvents* fse = this;
   fse->asyncStart();
   fse->threadStart();
 
-  info.GetReturnValue().Set(info.This());
+  return info.This();
 }

@@ -3,7 +3,8 @@
 ** Licensed under MIT License.
 */
 
-#include "nan.h"
+#include "napi.h"
+#include "uv.h"
 #include "uv.h"
 #include "v8.h"
 #include "CoreFoundation/CoreFoundation.h"
@@ -13,7 +14,7 @@
 
 #include "src/storage.cc"
 namespace fse {
-  class FSEvents : public Nan::ObjectWrap {
+  class FSEvents : public Napi::ObjectWrap<FSEvents> {
   public:
     explicit FSEvents(const char *path);
     ~FSEvents();
@@ -34,7 +35,7 @@ namespace fse {
     void threadStop();
 
     // methods.cc - internal
-    Nan::AsyncResource async_resource;
+    Napi::AsyncResource async_resource;
     void emitEvent(const char *path, UInt32 flags, UInt64 id);
 
     // Common
@@ -43,9 +44,9 @@ namespace fse {
     static void Initialize(v8::Handle<v8::Object> exports);
 
     // methods.cc - exposed
-    static NAN_METHOD(New);
-    static NAN_METHOD(Stop);
-    static NAN_METHOD(Start);
+    static Napi::Value New(const Napi::CallbackInfo& info);
+    static Napi::Value Stop(const Napi::CallbackInfo& info);
+    static Napi::Value Start(const Napi::CallbackInfo& info);
 
   };
 }
@@ -74,18 +75,18 @@ FSEvents::~FSEvents() {
 #include "src/methods.cc"
 
 void FSEvents::Initialize(v8::Handle<v8::Object> exports) {
-  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(FSEvents::New);
-  tpl->SetClassName(Nan::New<v8::String>("FSEvents").ToLocalChecked());
-  tpl->InstanceTemplate()->SetInternalFieldCount(1);
-  tpl->PrototypeTemplate()->Set(
-           Nan::New<v8::String>("start").ToLocalChecked(),
-           Nan::New<v8::FunctionTemplate>(FSEvents::Start));
-  tpl->PrototypeTemplate()->Set(
-           Nan::New<v8::String>("stop").ToLocalChecked(),
-           Nan::New<v8::FunctionTemplate>(FSEvents::Stop));
-  exports->Set(Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
-  exports->Set(Nan::New<v8::String>("FSEvents").ToLocalChecked(),
+  Napi::FunctionReference tpl = Napi::Function::New(env, FSEvents::New);
+  tpl->SetClassName(Napi::String::New(env, "FSEvents"));
+
+  tpl->PrototypeTemplate().Set(
+           Napi::String::New(env, "start"),
+           Napi::Function::New(env, FSEvents::Start));
+  tpl->PrototypeTemplate().Set(
+           Napi::String::New(env, "stop"),
+           Napi::Function::New(env, FSEvents::Stop));
+  exports.Set(Napi::String::New(env, "Constants"), Constants());
+  exports.Set(Napi::String::New(env, "FSEvents"),
                tpl->GetFunction());
 }
 
-NODE_MODULE(fse, FSEvents::Initialize)
+NODE_API_MODULE(fse, FSEvents::Initialize)

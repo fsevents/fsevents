@@ -84,27 +84,27 @@
 #define kFSEventStreamEventFlagItemIsSymlink 0x00040000
 #endif
 
-static v8::Local<v8::Object> Constants() {
-  v8::Local<v8::Object> object = Nan::New<v8::Object>();
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagNone").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagNone));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagMustScanSubDirs").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagMustScanSubDirs));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagUserDropped").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagUserDropped));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagKernelDropped").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagKernelDropped));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagEventIdsWrapped").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagEventIdsWrapped));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagHistoryDone").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagHistoryDone));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagRootChanged").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagRootChanged));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagMount").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagMount));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagUnmount").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagUnmount));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemCreated").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemCreated));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemRemoved").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemRemoved));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemInodeMetaMod").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemInodeMetaMod));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemRenamed").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemRenamed));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemModified").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemModified));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemFinderInfoMod").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemFinderInfoMod));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemChangeOwner").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemChangeOwner));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemXattrMod").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemXattrMod));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemIsFile").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemIsFile));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemIsDir").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemIsDir));
-  object->Set(Nan::New<v8::String>("kFSEventStreamEventFlagItemIsSymlink").ToLocalChecked(), Nan::New<v8::Integer>(kFSEventStreamEventFlagItemIsSymlink));
+static Napi::Object Constants() {
+  Napi::Object object = Napi::Object::New(env);
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagNone"), Napi::Number::New(env, kFSEventStreamEventFlagNone));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagMustScanSubDirs"), Napi::Number::New(env, kFSEventStreamEventFlagMustScanSubDirs));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagUserDropped"), Napi::Number::New(env, kFSEventStreamEventFlagUserDropped));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagKernelDropped"), Napi::Number::New(env, kFSEventStreamEventFlagKernelDropped));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagEventIdsWrapped"), Napi::Number::New(env, kFSEventStreamEventFlagEventIdsWrapped));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagHistoryDone"), Napi::Number::New(env, kFSEventStreamEventFlagHistoryDone));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagRootChanged"), Napi::Number::New(env, kFSEventStreamEventFlagRootChanged));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagMount"), Napi::Number::New(env, kFSEventStreamEventFlagMount));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagUnmount"), Napi::Number::New(env, kFSEventStreamEventFlagUnmount));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemCreated"), Napi::Number::New(env, kFSEventStreamEventFlagItemCreated));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemRemoved"), Napi::Number::New(env, kFSEventStreamEventFlagItemRemoved));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemInodeMetaMod"), Napi::Number::New(env, kFSEventStreamEventFlagItemInodeMetaMod));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemRenamed"), Napi::Number::New(env, kFSEventStreamEventFlagItemRenamed));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemModified"), Napi::Number::New(env, kFSEventStreamEventFlagItemModified));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemFinderInfoMod"), Napi::Number::New(env, kFSEventStreamEventFlagItemFinderInfoMod));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemChangeOwner"), Napi::Number::New(env, kFSEventStreamEventFlagItemChangeOwner));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemXattrMod"), Napi::Number::New(env, kFSEventStreamEventFlagItemXattrMod));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemIsFile"), Napi::Number::New(env, kFSEventStreamEventFlagItemIsFile));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemIsDir"), Napi::Number::New(env, kFSEventStreamEventFlagItemIsDir));
+  object.Set(Napi::String::New(env, "kFSEventStreamEventFlagItemIsSymlink"), Napi::Number::New(env, kFSEventStreamEventFlagItemIsSymlink));
   return object;
 }
