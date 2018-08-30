@@ -8,7 +8,7 @@
         "target_name": "<(module_name)",
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
-      "xcode_settings": { "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+      "xcode_settings": {
         "CLANG_CXX_LIBRARY": "libc++",
         "MACOSX_DEPLOYMENT_TARGET": "10.7",
       },
@@ -23,12 +23,13 @@
         },
         "include_dirs": [
           "<!@(node -p \"require('node-addon-api').include\")",
-        ]
+        ],
+        "defines": [ "NAPI_DISABLE_CPP_EXCEPTIONS" ],
       }, {
         "target_name": "action_after_build",
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
-      "xcode_settings": { "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+      "xcode_settings": {
         "CLANG_CXX_LIBRARY": "libc++",
         "MACOSX_DEPLOYMENT_TARGET": "10.7",
       },
