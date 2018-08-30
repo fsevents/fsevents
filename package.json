@@ -21,10 +21,13 @@
   },
   "binary": {
     "module_name": "fse",
-    "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}/",
+    "module_path": "./lib/binding/{configuration}/{platform}-{arch}-napi{napi_build_version}/",
     "remote_path": "./v{version}/",
-    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://fsevents-binaries.s3-us-west-2.amazonaws.com"
+    "package_name": "{module_name}-v{version}-napi{napi_build_version}-{platform}-{arch}.tar.gz",
+    "host": "https://fsevents-binaries.s3-us-west-2.amazonaws.com",
+    "napi_versions": [
+      1
+    ]
   },
   "repository": {
     "type": "git",
