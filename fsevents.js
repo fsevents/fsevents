@@ -15,20 +15,29 @@ var Native = require(binary.find(path.join(__dirname, 'package.json')));
 
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
-var inherits = require('util').inherits;
 
-function FSEvents(path, handler) {
-  EventEmitter.call(this);
+class FSEvents extends EventEmitter {
+  constructor(path, handler) {
+    super();
+    Object.defineProperty(this, '_impl', {
+      value: new Native.FSEvents(String(path || ''), handler),
+      enumerable: false,
+      writable: false
+    });
+  }
 
-  Object.defineProperty(this, '_impl', {
-    value: new Native.FSEvents(String(path || ''), handler),
-    enumerable: false,
-    writable: false
-  });
+  start() {
+    this._impl.start();
+
+    return this;
+  }
+
+  stop() {
+    this._impl.stop();
+
+    return this;
+  }
 }
-
-inherits(FSEvents, EventEmitter);
-proxies(FSEvents, Native.FSEvents);
 
 module.exports = watch;
 module.exports.getInfo = getInfo;
@@ -57,17 +66,6 @@ function watch(path) {
       }
     });
   }
-}
-
-function proxies(ctor, target) {
-  Object.keys(target.prototype).filter(function(key) {
-    return typeof target.prototype[key] === 'function';
-  }).forEach(function(key) {
-    ctor.prototype[key] = function() {
-      this._impl[key].apply(this._impl, arguments);
-      return this;
-    }
-  });
 }
 
 function getFileType(flags) {
