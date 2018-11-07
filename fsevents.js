@@ -1,34 +1,48 @@
 /*
- ** © 2014 by Philipp Dunkel <pip@pipobscure.com>
+ ** © 2014-2018 by Philipp Dunkel <pip@pipobscure.com>
  ** Licensed under MIT License.
  */
 
 /* jshint node:true */
 'use strict';
 
-if (process.platform !== 'darwin')
-  throw new Error('Module \'fsevents\' is not compatible with platform \'' + process.platform + '\'');
+if (process.platform !== 'darwin') {
+  throw new Error(`Module 'fsevents' is not compatible with platform '${process.platform}'`);
+}
 
-var path = require('path');
-var binary = require('node-pre-gyp');
-var Native = require(binary.find(path.join(__dirname, 'package.json')));
+var Native = require('./fsevents.node');
 
 var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
 var inherits = require('util').inherits;
 
+Native.FSEvents = function FSEvents(path, handler) {
+  if ('string' !== typeof path) throw new TypeError('path must be a string');
+  if ('function' !== typeof handler) throw new TypeError('handler must be a function');
+
+  let native;
+  this.start = () => {
+    if (native) return this;
+    native = Native.start(path, handler);
+    return this;
+  };
+  this.stop = () => {
+    if (!native) return this;
+    native = Native.stop(native);
+    return this;
+  };
+  this[Symbol.toStringTag] = 'FSEvents';
+};
+
+const native = Symbol('native');
 function FSEvents(path, handler) {
   EventEmitter.call(this);
-
-  Object.defineProperty(this, '_impl', {
-    value: new Native.FSEvents(String(path || ''), handler),
-    enumerable: false,
-    writable: false
-  });
+  this[native] = new Native.FSEvents(String(path || ''), handler);
 }
 
 inherits(FSEvents, EventEmitter);
-proxies(FSEvents, Native.FSEvents);
+FSEvents.prototype.start = function () { this[native].start(); return this; };
+FSEvents.prototype.stop = function () { this[native].stop(); return this; };
 
 module.exports = watch;
 module.exports.getInfo = getInfo;
@@ -43,12 +57,12 @@ function watch(path) {
   return fse;
 
   function handler(path, flags, id) {
-    defer(function() {
+    defer(function () {
       fse.emit('fsevent', path, flags, id);
       var info = getInfo(path, flags);
       info.id = id;
       if (info.event === 'moved') {
-        fs.stat(info.path, function(err, stat) {
+        fs.stat(info.path, function (err, stat) {
           info.event = (err || !stat) ? 'moved-out' : 'moved-in';
           fse.emit('change', path, info);
           fse.emit(info.event, path, info);
@@ -59,17 +73,6 @@ function watch(path) {
       }
     });
   }
-}
-
-function proxies(ctor, target) {
-  Object.keys(target.prototype).filter(function(key) {
-    return typeof target.prototype[key] === 'function';
-  }).forEach(function(key) {
-    ctor.prototype[key] = function() {
-      this._impl[key].apply(this._impl, arguments);
-      return this;
-    }
-  });
 }
 
 function getFileType(flags) {
@@ -90,10 +93,10 @@ function getEventType(flags) {
 
 function getFileChanges(flags) {
   return {
-    inode: !! (Native.Constants.kFSEventStreamEventFlagItemInodeMetaMod & flags),
-    finder: !! (Native.Constants.kFSEventStreamEventFlagItemFinderInfoMod & flags),
-    access: !! (Native.Constants.kFSEventStreamEventFlagItemChangeOwner & flags),
-    xattrs: !! (Native.Constants.kFSEventStreamEventFlagItemXattrMod & flags)
+    inode: !!(Native.Constants.kFSEventStreamEventFlagItemInodeMetaMod & flags),
+    finder: !!(Native.Constants.kFSEventStreamEventFlagItemFinderInfoMod & flags),
+    access: !!(Native.Constants.kFSEventStreamEventFlagItemChangeOwner & flags),
+    xattrs: !!(Native.Constants.kFSEventStreamEventFlagItemXattrMod & flags)
   };
 }
 
