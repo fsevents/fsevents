@@ -1,15 +1,5 @@
 language: objective-c
 
-env:
-  global:
-    - secure: "gve1nkeKkwFEG1VAT3i+JwYyAdF0gKXwKx0uxbkBTsmm2M+0MDusohQdFLoEIkSIFktXBIDefoa7iGpLKRfG2VsZLpwJgnvnD0HqbnuR+k+W+bu7BHt4CAaR6GTllsDCjyq9zNyhUThzSnf2WNIpOEF5kHspZlbGfawURuUJH/U="
-    - secure: "jqVpmWxxBVXu2X8+XJMpKH0cooc2EKz9xKL2znBfYdNafJORSXcFAVbjCX5mZmVDcgIMwDtm2+gIG4P73hzJ2e3S+y2Z9ROJGyXHa3AxUTvXHQsxqzH8coHHqB8vTvfr0t2O5aKfpvpICpSea39r0hzNoMv6Ie5SwBdqj1YY9K0="
-  matrix:
-    - NODE_VERSION="v11"
-    - NODE_VERSION="v10"
-    - NODE_VERSION="v9"
-    - NODE_VERSION="v8"
-
 before_install:
   - echo $TRAVIS_OS_NAME
 
@@ -19,21 +9,34 @@ before_install:
   - export PATH=./node_modules/.bin/:$PATH
   - rm -rf ~/.nvm && git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh
-  - nvm install $NODE_VERSION
-  - nvm use $NODE_VERSION
-  - npm install -g npm@3
-  - node --version
-  - npm --version
-  - nvm --version
+  - nvm install v6
+  - nvm install v8
+  - nvm install v10
+  - nvm install v11
 
   # publish dependencies
   # ------------------------
 
 install:
-  - if [[ "$NODE_VERSION" == "11" ]]; then npm run prepare; fi;
-  - npm run install
+  - nvm use v11
+  - npm install
 
 script:
+  - nvm use v6
+  - npm -- version
+  - node --version
+  - npm test
+  - nvm use v8
+  - npm -- version
+  - node --version
+  - npm test
+  - nvm use v10
+  - npm -- version
+  - node --version
+  - npm test
+  - nvm use v11
+  - npm -- version
+  - node --version
   - npm test
 
 after_success:

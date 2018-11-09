@@ -1,44 +1,125 @@
 /*
-** © 2018 by Philipp Dunkel <pip@pipobscure.com>
+** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
 ** Licensed under MIT License.
 */
 
 #include "runner.h"
-#define NAPI_EXPERIMENTAL
 #include <node_api.h>
-#include <stdio.h>
 
-static void Callback(napi_env env, napi_value js_cb, void* context, void* data) {
-  fse_event_t *event = (fse_event_t*)data;
-  napi_value argv[3];
-  napi_value this, result;
-  assert(napi_get_null(env, &this) == napi_ok);
-  assert(napi_create_string_utf8(env, event->path, event->pathlen, &argv[0]) == napi_ok);
-  napi_create_int32(env, event->flags, &argv[1]);
-  napi_create_int64(env, event->id, &argv[2]);
-  assert(napi_call_function(env, this, js_cb, 3, argv, &result) == napi_ok);
-  free(event);
-}
+// constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamEventFlags
+#ifndef kFSEventStreamEventFlagNone
+#define kFSEventStreamEventFlagNone 0x00000000
+#endif
 
-static void cleanup(napi_env env, void* data, void* ignored) {
-  fse_t *instance = (fse_t*)data;
-  stop(instance);
-  free(instance);
-}
+#ifndef kFSEventStreamEventFlagMustScanSubDirs
+#define kFSEventStreamEventFlagMustScanSubDirs 0x00000001
+#endif
+
+#ifndef kFSEventStreamEventFlagUserDropped
+#define kFSEventStreamEventFlagUserDropped 0x00000002
+#endif
+
+#ifndef kFSEventStreamEventFlagKernelDropped
+#define kFSEventStreamEventFlagKernelDropped 0x00000004
+#endif
+
+#ifndef kFSEventStreamEventFlagEventIdsWrapped
+#define kFSEventStreamEventFlagEventIdsWrapped 0x00000008
+#endif
+
+#ifndef kFSEventStreamEventFlagHistoryDone
+#define kFSEventStreamEventFlagHistoryDone 0x00000010
+#endif
+
+#ifndef kFSEventStreamEventFlagRootChanged
+#define kFSEventStreamEventFlagRootChanged 0x00000020
+#endif
+
+#ifndef kFSEventStreamEventFlagMount
+#define kFSEventStreamEventFlagMount 0x00000040
+#endif
+
+#ifndef kFSEventStreamEventFlagUnmount
+#define kFSEventStreamEventFlagUnmount 0x00000080
+#endif
+
+#ifndef kFSEventStreamEventFlagItemCreated
+#define kFSEventStreamEventFlagItemCreated 0x00000100
+#endif
+
+#ifndef kFSEventStreamEventFlagItemRemoved
+#define kFSEventStreamEventFlagItemRemoved 0x00000200
+#endif
+
+#ifndef kFSEventStreamEventFlagItemInodeMetaMod
+#define kFSEventStreamEventFlagItemInodeMetaMod 0x00000400
+#endif
+
+#ifndef kFSEventStreamEventFlagItemRenamed
+#define kFSEventStreamEventFlagItemRenamed 0x00000800
+#endif
+
+#ifndef kFSEventStreamEventFlagItemModified
+#define kFSEventStreamEventFlagItemModified 0x00001000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemFinderInfoMod
+#define kFSEventStreamEventFlagItemFinderInfoMod 0x00002000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemChangeOwner
+#define kFSEventStreamEventFlagItemChangeOwner 0x00004000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemXattrMod
+#define kFSEventStreamEventFlagItemXattrMod 0x00008000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemIsFile
+#define kFSEventStreamEventFlagItemIsFile 0x00010000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemIsDir
+#define kFSEventStreamEventFlagItemIsDir 0x00020000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemIsSymlink
+#define kFSEventStreamEventFlagItemIsSymlink 0x00040000
+#endif
+
+// constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamCreateFlags
+#ifndef kFSEventStreamCreateFlagNone
+#define kFSEventStreamCreateFlagNone 0x00000000
+#endif
+
+#ifndef kFSEventStreamCreateFlagUseCFTypes
+#define kFSEventStreamCreateFlagUseCFTypes 0x00000001
+#endif
+
+#ifndef kFSEventStreamCreateFlagNoDefer
+#define kFSEventStreamCreateFlagNoDefer 0x00000002
+#endif
+
+#ifndef kFSEventStreamCreateFlagWatchRoot
+#define kFSEventStreamCreateFlagWatchRoot 0x00000004
+#endif
+
+#ifndef kFSEventStreamCreateFlagIgnoreSelf
+#define kFSEventStreamCreateFlagIgnoreSelf 0x00000008
+#endif
+
+#ifndef kFSEventStreamCreateFlagFileEvents
+#define kFSEventStreamCreateFlagFileEvents 0x00000010
+#endif
 
 static napi_value FSEStart(napi_env env, napi_callback_info info) {
   size_t argc = 2;
-  napi_value argv[2], result;
+  napi_value argv[2];
   char path[PATH_MAX];
-  napi_threadsafe_function cb;
 
   assert(napi_get_cb_info(env, info, &argc, argv,  NULL, NULL) == napi_ok);
   assert(napi_get_value_string_utf8(env, argv[0], path, PATH_MAX, &argc) == 0);
-  assert(napi_create_threadsafe_function(env, argv[1], NULL, argv[0], 0, 1, NULL, NULL, NULL, Callback, &cb) == napi_ok);
-
-  void *instance = start(path, cb);
-  assert(napi_create_external(env, (void*) instance, cleanup, NULL, &result) == napi_ok);
-  return result;
+  return start(env, path, argv[1]);
 }
 static napi_value FSEStop(napi_env env, napi_callback_info info) {
   size_t argc = 1;
@@ -51,7 +132,7 @@ static napi_value FSEStop(napi_env env, napi_callback_info info) {
   return result;
 }
 
-/*napi_value*/ NAPI_MODULE_INIT(/*napi_env env, napi_value exports*/) {
+napi_value Init(napi_env env, napi_value exports) {
   napi_value constants;
   napi_value value;
   assert(napi_create_object(env, &constants) == napi_ok);
@@ -125,3 +206,5 @@ static napi_value FSEStop(napi_env env, napi_callback_info info) {
 
   return exports;
 }
+
+NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)

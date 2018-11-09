@@ -10,10 +10,10 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "clean": "node-gyp clean && [ -f 'fsevents.bak.js' ] && mv -f fsevents.bak.js fsevents.js",
+    "clean": "node-gyp clean",
+    "install": "[ -f fsevents.node ] || npm run prepare",
     "test": "tap ./test",
-    "prepare": "node-gyp clean && node-gyp configure && node-gyp build",
-    "install": "node installtest.js || ./fallback.sh"
+    "prepare": "node-gyp clean && node-gyp configure && node-gyp build"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,20 @@
     "fsevents",
     "mac"
   ],
-  "author": "Philipp Dunkel <pip@pipobscure.com>",
+  "contributors": [
+    {
+      "name": "Philipp Dunkel",
+      "email": "pip@pipobscure.com"
+    },
+    {
+      "name": "Ben Noordhuis",
+      "email": "info@bnoordhuis.nl"
+    },
+    {
+      "name": "Elan Shankar",
+      "email": "elan.shanker@gmail.com"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/strongloop/fsevents/issues"

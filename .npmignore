@@ -1,4 +1,6 @@
+.gitignore
+.npmignore
+.travis.yml
+package-lock.json
 build/
 node_modules/
-lib/
-package-lock.json
