@@ -14,6 +14,12 @@
 #include <node_api.h>
 #include <uv.h>
 
+#ifdef NDEBUG
+#define CHECK(x) do { if (!(x)) abort(); } while (0)
+#else
+#define CHECK assert
+#endif
+
 typedef struct {
   char path[PATH_MAX];
 
@@ -29,7 +35,7 @@ typedef struct {
   void *tail;
 } fse_t;
 
-napi_value start(napi_env env, const char path[PATH_MAX], napi_value callback);
+napi_value start(napi_env env, const char (*path)[PATH_MAX], napi_value callback);
 void stop(fse_t *instance);
 
 #endif

@@ -19,27 +19,29 @@ class FSEvents {
   constructor(path, handler) {
     if ('string' !== typeof path) throw new TypeError('path must be a string');
     if ('function' !== typeof handler) throw new TypeError('function must be a function');
-    this.path = path;
-    this.handler = handler;
-    this[Symbol.toStringTag] = 'FSEvents';
-    Object.freeze(this);
+    Object.defineProperties(this, {
+      path: { value: path },
+      handler: { value: handler }
+    });
   }
   start() {
-    if(native.has(this)) return;
+    if (native.has(this)) return;
     const instance = Native.start(this.path, this.handler);
     native.set(this, instance);
     return this;
   }
   stop() {
     const instance = native.get(this);
+    if (!instance) return;
     Native.stop(instance);
     native.delete(this);
     return this;
   }
 }
+FSEvents.prototype[Symbol.toStringTag] = 'FSEvents';
 
 const fse = Symbol('fsevents');
-class Watcher extends EventEmitter {
+class Emitter extends EventEmitter {
   constructor(path) {
     super();
     this[fse] = new FSEvents(path, (...args) => this.pushEvent(...args));
@@ -69,7 +71,9 @@ class Watcher extends EventEmitter {
     }
   }
 }
-module.exports = (path)=>new Watcher(path);
+Emitter.prototype[Symbol.toStringTag] = 'FSEventsEmitter';
+
+module.exports = (path)=>new Emitter(path);
 module.exports.getInfo = getInfo;
 module.exports.FSEvents = FSEvents;
 module.exports.Constants = Native.Constants;
