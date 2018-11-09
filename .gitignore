@@ -1,4 +1,4 @@
+fsevents.node
+package-lock.json
 build/
 node_modules/
-lib/
-package-lock.json

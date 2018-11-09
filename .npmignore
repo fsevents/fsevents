@@ -1,1 +1,6 @@
-test/
+.gitignore
+.npmignore
+.travis.yml
+package-lock.json
+build/
+node_modules/
