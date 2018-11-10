@@ -46,7 +46,7 @@ void handleEvents(
       instance->tail = event;
     }
   }
-  uv_async_send(&instance->async);
+  uv_async_send(instance->async);
   uv_mutex_unlock(&instance->mutex);
 }
 
@@ -94,11 +94,14 @@ void execute(void *data) {
   instance->loop = NULL;
 }
 
-void cleanup(napi_env env, void* data, void* ignored) {
+void napi_cleanup(napi_env env, void* data, void* ignored) {
   fse_t *instance = (fse_t*)data;
   stop(instance);
   CHECK(napi_delete_reference(instance->env, instance->callback) == napi_ok);
   free(instance);
+}
+void async_cleanup(uv_async_t* handle) {
+  free(handle);
 }
 
 void stop(fse_t *instance) {
@@ -106,15 +109,18 @@ void stop(fse_t *instance) {
   unsigned int count = 0;
   CFRunLoopStop(instance->loop);
   CHECK(!uv_thread_join(&instance->thread));
-  instance->async.data = NULL;
-  uv_close((uv_handle_t *) &instance->async, NULL);
+  instance->async->data = NULL;
   uv_mutex_destroy(&instance->mutex);
+  uv_close((uv_handle_t *) instance->async, async_cleanup);
+  instance->async = NULL;
   CHECK(napi_reference_unref(instance->env, instance->callback, &count) == napi_ok);
 }
 
 napi_value start(napi_env env, const char (*path)[PATH_MAX], napi_value callback) {
   napi_value result;
   fse_t *instance = malloc(sizeof(*instance));
+  instance->async = malloc(sizeof(*instance->async));
+
   memcpy(instance->path, path, PATH_MAX);
 
   instance->env = env;
@@ -122,11 +128,11 @@ napi_value start(napi_env env, const char (*path)[PATH_MAX], napi_value callback
   instance->tail = NULL;
 
   CHECK(napi_create_reference(env, callback, 1, &instance->callback) == napi_ok);
-  CHECK(!uv_async_init(uv_default_loop(), &instance->async, (uv_async_cb) eventCallback));
+  CHECK(!uv_async_init(uv_default_loop(), instance->async, (uv_async_cb) eventCallback));
   CHECK(!uv_mutex_init(&instance->mutex));
-  instance->async.data = instance;
+  instance->async->data = instance;
   CHECK(!uv_thread_create(&instance->thread, execute, (void*)instance));
 
-  CHECK(napi_create_external(env, instance, cleanup, NULL, &result) == napi_ok);
+  CHECK(napi_create_external(env, instance, napi_cleanup, NULL, &result) == napi_ok);
   return result;
 }

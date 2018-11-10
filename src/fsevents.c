@@ -6,7 +6,10 @@
 #include "runner.h"
 #include <node_api.h>
 
-#define CONST(name, const_val) CHECK(napi_create_int32(env, const_val, &value) == napi_ok); CHECK(napi_set_named_property(env, constants, name, value) == napi_ok);
+#define CONSTANT(name) do {\
+  CHECK(napi_create_int32(env, name, &value) == napi_ok);\
+  CHECK(napi_set_named_property(env, constants, #name, value) == napi_ok);\
+} while (0)
 
 // constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamEventFlags
 #ifndef kFSEventStreamEventFlagNone
@@ -121,7 +124,7 @@ static napi_value FSEStart(napi_env env, napi_callback_info info) {
 
   CHECK(napi_get_cb_info(env, info, &argc, argv,  NULL, NULL) == napi_ok);
   CHECK(napi_get_value_string_utf8(env, argv[0], path, PATH_MAX, &argc) == 0);
-  return start(env, (const char (*)[PATH_MAX]) path, argv[1]);
+  return start(env, &path, argv[1]);
 }
 static napi_value FSEStop(napi_env env, napi_callback_info info) {
   size_t argc = 1;
@@ -139,26 +142,26 @@ napi_value Init(napi_env env, napi_value exports) {
   napi_value value;
   CHECK(napi_create_object(env, &constants) == napi_ok);
 
-  CONST("kFSEventStreamEventFlagNone", kFSEventStreamEventFlagNone)
-  CONST("kFSEventStreamEventFlagMustScanSubDirs", kFSEventStreamEventFlagMustScanSubDirs)
-  CONST("kFSEventStreamEventFlagUserDropped", kFSEventStreamEventFlagMustScanSubDirs)
-  CONST("kFSEventStreamEventFlagKernelDropped", kFSEventStreamEventFlagKernelDropped)
-  CONST("kFSEventStreamEventFlagEventIdsWrapped", kFSEventStreamEventFlagEventIdsWrapped)
-  CONST("kFSEventStreamEventFlagHistoryDone", kFSEventStreamEventFlagHistoryDone)
-  CONST("kFSEventStreamEventFlagRootChanged", kFSEventStreamEventFlagRootChanged)
-  CONST("kFSEventStreamEventFlagMount", kFSEventStreamEventFlagMount)
-  CONST("kFSEventStreamEventFlagUnmount", kFSEventStreamEventFlagUnmount)
-  CONST("kFSEventStreamEventFlagItemCreated", kFSEventStreamEventFlagItemCreated)
-  CONST("kFSEventStreamEventFlagItemRemoved", kFSEventStreamEventFlagItemRemoved)
-  CONST("kFSEventStreamEventFlagItemInodeMetaMod", kFSEventStreamEventFlagItemInodeMetaMod)
-  CONST("kFSEventStreamEventFlagItemRenamed", kFSEventStreamEventFlagItemRenamed)
-  CONST("kFSEventStreamEventFlagItemModified", kFSEventStreamEventFlagItemModified)
-  CONST("kFSEventStreamEventFlagItemFinderInfoMod", kFSEventStreamEventFlagItemFinderInfoMod)
-  CONST("kFSEventStreamEventFlagItemChangeOwner", kFSEventStreamEventFlagItemChangeOwner)
-  CONST("kFSEventStreamEventFlagItemXattrMod", kFSEventStreamEventFlagItemXattrMod)
-  CONST("kFSEventStreamEventFlagItemIsFile", kFSEventStreamEventFlagItemIsFile)
-  CONST("kFSEventStreamEventFlagItemIsDir", kFSEventStreamEventFlagItemIsDir)
-  CONST("kFSEventStreamEventFlagItemIsSymlink", kFSEventStreamEventFlagItemIsSymlink)
+  CONSTANT(kFSEventStreamEventFlagNone);
+  CONSTANT(kFSEventStreamEventFlagMustScanSubDirs);
+  CONSTANT(kFSEventStreamEventFlagUserDropped);
+  CONSTANT(kFSEventStreamEventFlagKernelDropped);
+  CONSTANT(kFSEventStreamEventFlagEventIdsWrapped);
+  CONSTANT(kFSEventStreamEventFlagHistoryDone);
+  CONSTANT(kFSEventStreamEventFlagRootChanged);
+  CONSTANT(kFSEventStreamEventFlagMount);
+  CONSTANT(kFSEventStreamEventFlagUnmount);
+  CONSTANT(kFSEventStreamEventFlagItemCreated);
+  CONSTANT(kFSEventStreamEventFlagItemRemoved);
+  CONSTANT(kFSEventStreamEventFlagItemInodeMetaMod);
+  CONSTANT(kFSEventStreamEventFlagItemRenamed);
+  CONSTANT(kFSEventStreamEventFlagItemModified);
+  CONSTANT(kFSEventStreamEventFlagItemFinderInfoMod);
+  CONSTANT(kFSEventStreamEventFlagItemChangeOwner);
+  CONSTANT(kFSEventStreamEventFlagItemXattrMod);
+  CONSTANT(kFSEventStreamEventFlagItemIsFile);
+  CONSTANT(kFSEventStreamEventFlagItemIsDir);
+  CONSTANT(kFSEventStreamEventFlagItemIsSymlink);
 
   napi_property_descriptor descriptors[] = {
     { "Constants", NULL,  NULL,     NULL, NULL,  constants, napi_default, NULL },
