@@ -28,7 +28,7 @@ typedef struct {
 
   CFRunLoopRef loop;
   uv_thread_t thread;
-  uv_async_t *async;
+  uv_async_t async;
   uv_mutex_t mutex;
 
   void *head;

@@ -21,7 +21,13 @@ class FSEvents {
     if ('function' !== typeof handler) throw new TypeError('function must be a function');
     Object.defineProperties(this, {
       path: { value: path },
-      handler: { value: handler }
+      handler: {
+        value: (...args)=>{
+          Promise.resolve().then(()=>{
+            handler(...args)
+          });
+        }
+      }
     });
   }
   start() {
@@ -55,20 +61,20 @@ class Emitter extends EventEmitter {
     return this;
   }
   pushEvent(path, flags, id) {
-    this.emit('fsevent', path, flags, id);
-    const info = getInfo(path, flags, id);
-    if (info.event === 'moved') {
-      stat(info.path, (err, stat) => {
-        info.event = (err || !stat) ? 'moved-out' : 'moved-in';
+    Promise.resolve().then(() => {
+      this.emit('fsevent', path, flags, id);
+      const info = getInfo(path, flags, id);
+      if (info.event === 'moved') {
+        stat(info.path, (err, stat) => {
+          info.event = (err || !stat) ? 'moved-out' : 'moved-in';
+          this.emit('change', path, info);
+          this.emit(info.event, path, info);
+        });
+      } else {
         this.emit('change', path, info);
         this.emit(info.event, path, info);
-      });
-    } else {
-      Promise.resolve().then(() => {
-        this.emit('change', path, info);
-        this.emit(info.event, path, info);
-      });
-    }
+      }
+    });
   }
 }
 Emitter.prototype[Symbol.toStringTag] = 'FSEventsEmitter';

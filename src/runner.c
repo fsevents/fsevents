@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <stdio.h>
 #include "CoreFoundation/CoreFoundation.h"
 #define NAPI_EXPERIMENTAL
 #include <node_api.h>
@@ -29,6 +30,7 @@ void handleEvents(
 ) {
   size_t idx;
   fse_t *instance = (fse_t *)data;
+  if (!instance->loop) return;
 
   uv_mutex_lock(&instance->mutex);
   for (idx=0; idx < numEvents; idx++) {
@@ -47,15 +49,26 @@ void handleEvents(
       instance->tail = event;
     }
   }
-  uv_async_send(instance->async);
   uv_mutex_unlock(&instance->mutex);
+  uv_async_send(&instance->async);
 }
+
 
 void eventCallback(uv_async_t *async) {
   fse_t *instance = async->data;
   napi_handle_scope scope;
   napi_value this, callback, argv[3], result;
   fse_event_t *event;
+
+  if (!instance->loop) {
+    while (instance->tail) {
+      event = instance->tail;
+      instance->tail = event->next;
+      free(event);
+    }
+    return;
+  };
+
   uv_mutex_lock(&instance->mutex);
   CHECK(napi_open_handle_scope(instance->env, &scope) == napi_ok);
   CHECK(napi_get_null(instance->env, &this) == napi_ok);
@@ -67,7 +80,7 @@ void eventCallback(uv_async_t *async) {
     CHECK(napi_create_string_utf8(instance->env, event->path, NAPI_AUTO_LENGTH, &argv[0]) == napi_ok);
     CHECK(napi_create_uint32(instance->env, event->flags, &argv[1]) == napi_ok);
     CHECK(napi_create_int64(instance->env, event->id, &argv[2]) == napi_ok);
-    napi_call_function(instance->env, this, callback, 3, argv, &result);
+    CHECK(napi_call_function(instance->env, this, callback, 3, argv, &result) == napi_ok);
     free(event);
   }
   CHECK(napi_close_handle_scope(instance->env, scope) == napi_ok);
@@ -95,14 +108,18 @@ void execute(void *data) {
   instance->loop = NULL;
 }
 
-void napi_cleanup(napi_env env, void* data, void* ignored) {
-  fse_t *instance = (fse_t*)data;
-  stop(instance);
+void async_cleanup(uv_handle_t* handle) {
+  uv_async_t *async = (uv_async_t*)handle;
+  fse_t *instance = async->data;
+  uv_mutex_destroy(&instance->mutex);
+
   CHECK(napi_delete_reference(instance->env, instance->callback) == napi_ok);
   free(instance);
 }
-void async_cleanup(uv_handle_t* handle) {
-  free(handle);
+
+void napi_cleanup(napi_env env, void* data, void* ignored) {
+  fse_t *instance = data;
+  stop(instance);
 }
 
 void stop(fse_t *instance) {
@@ -110,30 +127,28 @@ void stop(fse_t *instance) {
   unsigned int count = 0;
   CFRunLoopStop(instance->loop);
   CHECK(!uv_thread_join(&instance->thread));
-  instance->async->data = NULL;
-  uv_mutex_destroy(&instance->mutex);
-  uv_close((uv_handle_t *) instance->async, async_cleanup);
-  instance->async = NULL;
   CHECK(napi_reference_unref(instance->env, instance->callback, &count) == napi_ok);
+  CHECK(count == 0);
+  uv_close((uv_handle_t *) &instance->async, async_cleanup);
 }
 
 napi_value start(napi_env env, const char (*path)[PATH_MAX], napi_value callback) {
   napi_value result;
   fse_t *instance = malloc(sizeof(*instance));
   CHECK(instance);
-  instance->async = malloc(sizeof(*instance->async));
-  CHECK(instance->async);
 
   memcpy(instance->path, path, PATH_MAX);
-
   instance->env = env;
   instance->head = NULL;
   instance->tail = NULL;
 
   CHECK(napi_create_reference(env, callback, 1, &instance->callback) == napi_ok);
-  CHECK(!uv_async_init(uv_default_loop(), instance->async, (uv_async_cb) eventCallback));
+
   CHECK(!uv_mutex_init(&instance->mutex));
-  instance->async->data = instance;
+
+  CHECK(!uv_async_init(uv_default_loop(), &instance->async, (uv_async_cb) eventCallback));
+  instance->async.data = instance;
+
   CHECK(!uv_thread_create(&instance->thread, execute, (void*)instance));
 
   CHECK(napi_create_external(env, instance, napi_cleanup, NULL, &result) == napi_ok);
