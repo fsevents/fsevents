@@ -1,7 +1,7 @@
 /*
- ** © 2014 by Philipp Dunkel <pip@pipobscure.com>
- ** Licensed under MIT License.
- */
+** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
+** Licensed under MIT License.
+*/
 
 /* jshint node:true */
 'use strict';

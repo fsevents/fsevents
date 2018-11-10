@@ -57,7 +57,7 @@ All events except *fsevent* take an *info* object as the second parameter of the
 
 ## MIT License
 
-Copyright (C) 2010-2014 Philipp Dunkel
+Copyright (C) 2010-2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
