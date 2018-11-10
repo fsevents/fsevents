@@ -33,6 +33,7 @@ void handleEvents(
   uv_mutex_lock(&instance->mutex);
   for (idx=0; idx < numEvents; idx++) {
     fse_event_t *event = malloc(sizeof(*event));
+    CHECK(event);
     CFStringRef path = (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
     strncpy(event->path, CFStringGetCStringPtr(path, kCFStringEncodingUTF8), sizeof(event->path));
     event->id = eventIds[idx];
@@ -100,7 +101,7 @@ void napi_cleanup(napi_env env, void* data, void* ignored) {
   CHECK(napi_delete_reference(instance->env, instance->callback) == napi_ok);
   free(instance);
 }
-void async_cleanup(uv_async_t* handle) {
+void async_cleanup(uv_handle_t* handle) {
   free(handle);
 }
 
@@ -119,7 +120,9 @@ void stop(fse_t *instance) {
 napi_value start(napi_env env, const char (*path)[PATH_MAX], napi_value callback) {
   napi_value result;
   fse_t *instance = malloc(sizeof(*instance));
+  CHECK(instance);
   instance->async = malloc(sizeof(*instance->async));
+  CHECK(instance->async);
 
   memcpy(instance->path, path, PATH_MAX);
 

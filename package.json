@@ -10,7 +10,7 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "clean": "node-gyp clean",
+    "clean": "node-gyp clean && rm -f fsevents.node",
     "install": "[ -f fsevents.node ] || npm run prepare",
     "test": "tap ./test",
     "prepare": "node-gyp rebuild"
