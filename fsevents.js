@@ -73,7 +73,7 @@ class Emitter extends EventEmitter {
 }
 Emitter.prototype[Symbol.toStringTag] = 'FSEventsEmitter';
 
-module.exports = (path)=>new Emitter(path);
+module.exports = function (path) { return new Emitter(path); }
 module.exports.getInfo = getInfo;
 module.exports.FSEvents = FSEvents;
 module.exports.Constants = Native.Constants;
