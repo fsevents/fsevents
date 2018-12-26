@@ -1,19 +1,19 @@
 {
   "name": "fsevents",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "os": [
     "darwin"
   ],
   "engines": {
-    "node": "^6.14.2 || ^8.0 || >=10"
+    "node": "^10.6.0 || >=11.0.0"
   },
   "scripts": {
     "clean": "node-gyp clean && rm -f fsevents.node",
-    "install": "[ -f fsevents.node ] || npm run prepare",
-    "test": "tap ./test",
-    "prepare": "node-gyp rebuild && node-gyp clean"
+    "install": "[ -f fsevents.node ] || npm run prepublishOnly",
+    "test": "/bin/bash ./test.sh 2>/dev/null",
+    "prepublishOnly": "node-gyp clean && rm -f fsevents.node && node-gyp rebuild && node-gyp clean"
   },
   "repository": {
     "type": "git",
@@ -35,6 +35,10 @@
     {
       "name": "Elan Shankar",
       "email": "elan.shanker@gmail.com"
+    },
+    {
+      "name": "Miroslav Bajtoš",
+      "email": "mbajtoss@gmail.com"
     }
   ],
   "license": "MIT",
@@ -42,7 +46,5 @@
     "url": "https://github.com/strongloop/fsevents/issues"
   },
   "homepage": "https://github.com/strongloop/fsevents",
-  "devDependencies": {
-    "tap": "~12.0.1"
-  }
+  "devDependencies": {}
 }

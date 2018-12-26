@@ -3,7 +3,7 @@
     ['OS=="mac"', {
       "targets": [{
         "target_name": "fsevents",
-        "sources": [ "src/fsevents.c", "src/runner.c" ],
+        "sources": [ "src/fsevents.c", "src/rawfsevents.c" ],
         "xcode_settings": {
           "OTHER_LDFLAGS": [
             "-framework CoreFoundation -framework CoreServices"
