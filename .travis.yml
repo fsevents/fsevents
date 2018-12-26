@@ -9,8 +9,6 @@ before_install:
   - export PATH=./node_modules/.bin/:$PATH
   - rm -rf ~/.nvm && git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh
-  - nvm install v6
-  - nvm install v8
   - nvm install v10
   - nvm install v11
 
@@ -22,21 +20,9 @@ install:
   - npm install
 
 script:
-  - nvm use v6
-  - npm -- version
-  - node --version
-  - npm test
-  - nvm use v8
-  - npm -- version
-  - node --version
-  - npm test
   - nvm use v10
-  - npm -- version
-  - node --version
   - npm test
   - nvm use v11
-  - npm -- version
-  - node --version
   - npm test
 
 after_success:
