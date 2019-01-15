@@ -11,7 +11,7 @@
     "darwin"
   ],
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=4 <=11"
   },
   "scripts": {
     "install": "node install",
