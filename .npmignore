@@ -1,1 +1,3 @@
 test/
+build/
+lib/binding/

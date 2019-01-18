@@ -4,7 +4,7 @@
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
-    "nan": "^2.9.2",
+    "nan": "^2.12.1",
     "node-pre-gyp": "^0.10.0"
   },
   "os": [
@@ -44,6 +44,6 @@
   ],
   "homepage": "https://github.com/strongloop/fsevents",
   "devDependencies": {
-    "tap": "~0.4.8"
+    "tap": "^12.1.1"
   }
 }
