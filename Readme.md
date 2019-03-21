@@ -19,30 +19,32 @@ uses fsevents, check out [Chokidar](https://www.npmjs.com/package/chokidar).
 ## Usage
 
 ```js
-var fsevents = require('fsevents');
-var watcher = fsevents(__dirname);
-watcher.on('fsevent', function(path, flags, id) { }); // RAW Event as emitted by OS-X
-watcher.on('change', function(path, info) { }); // Common Event for all changes
-watcher.start() // To start observation
-watcher.stop()  // To end observation
+const fsevents = require('fsevents');
+let stop = fsevents.watch(__dirname, (path, flags, id)=>{
+  const info = fsevents.getInfo(path, flags, id);
+}); // To start observation
+stop(); // To end observation
 ```
 
-### Events
+### Callback
 
- * *fsevent* - RAW Event as emitted by OS-X
- * *change* - Common Event for all changes
- * *created* - A File-System-Item has been created
- * *deleted* - A File-System-Item has been deleted
- * *modified* - A File-System-Item has been modified
- * *moved-out* - A File-System-Item has been moved away from this location
- * *moved-in* - A File-System-Item has been moved into this location
+The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
+a change in the file system. It takes three arguments:
 
-All events except *fsevent* take an *info* object as the second parameter of the callback. The structure of this object is:
+ * `path` - which is a string naming the path of the item in the filesystem that changed
+ * `flags` - a numeric value describing what the change was
+ * `id` - a unique-id identifying this specific event
+
+### `getInfo(path, flags, id) => {info-object}`
+
+The `getInfo` function takes the `path`, `flags` and `id` arguments and converts those parameters into a structure
+that is easier to digest to determine what the change was.
+
+The `info-object` has the following shape:
 
 ```js
 {
-  "event": "<event-type>",
-  "id": <eventi-id>,
+  "event": "<deleted|moved|created|modified|root-changed|unknown>",
   "path": "<path-that-this-is-about>",
   "type": "<file|directory|symlink>",
   "changes": {
