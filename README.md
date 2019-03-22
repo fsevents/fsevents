@@ -7,7 +7,7 @@ changes to a given directory tree. It is a very fast and lightweight alternative
 to kqueue.
 
 This is a low-level library. For a cross-platform file watching module that
-uses fsevents, check out [Chokidar](https://www.npmjs.com/package/chokidar).
+uses fsevents, check out [Chokidar](https://github.com/paulmillr/chokidar).
 
 ## Installation
 
