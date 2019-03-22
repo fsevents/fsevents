@@ -9,12 +9,12 @@ to kqueue.
 This is a low-level library. For a cross-compatible file watching module that
 uses fsevents, check out [Chokidar](https://www.npmjs.com/package/chokidar).
 
-* [Module Site & GitHub](https://github.com/strongloop/fsevents)
+* [Module Site & GitHub](https://github.com/fsevents/fsevents)
 * [NPM Page](https://npmjs.org/package/fsevents)
 
 ## Installation
 
-	$ npm install fsevents
+	npm install fsevents
 
 ## Usage
 
