@@ -1,20 +1,19 @@
 # fsevents [![NPM](https://nodei.co/npm/fsevents.png)](https://nodei.co/npm/fsevents/)
 
-Native access to MacOS FSEvents in [Node.js](http://nodejs.org/)
+Native access to MacOS FSEvents in [Node.js](https://nodejs.org/)
 
 The FSEvents API in MacOS allows applications to register for notifications of
 changes to a given directory tree. It is a very fast and lightweight alternative
 to kqueue.
 
-This is a low-level library. For a cross-compatible file watching module that
+This is a low-level library. For a cross-platform file watching module that
 uses fsevents, check out [Chokidar](https://www.npmjs.com/package/chokidar).
-
-* [Module Site & GitHub](https://github.com/fsevents/fsevents)
-* [NPM Page](https://npmjs.org/package/fsevents)
 
 ## Installation
 
-	npm install fsevents
+```sh
+npm install fsevents
+```
 
 ## Usage
 
@@ -35,7 +34,7 @@ a change in the file system. It takes three arguments:
  * `flags` - a numeric value describing what the change was
  * `id` - a unique-id identifying this specific event
 
-#### `getInfo(path, flags, id) => {info-object}`
+###### `getInfo(path, flags, id) => {info-object}`
 
 The `getInfo` function takes the `path`, `flags` and `id` arguments and converts those parameters into a structure
 that is easier to digest to determine what the change was.
@@ -57,8 +56,8 @@ The `info-object` has the following shape:
 }
 ```
 
-## MIT License
+## License
 
-Copyright (C) 2010-2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
+The MIT License Copyright (C) 2010-2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar — see LICENSE file.
 
-See LICENSE file.
+Visit our [GitHub page](https://github.com/fsevents/fsevents) and [NPM Page](https://npmjs.org/package/fsevents)
