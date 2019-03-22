@@ -26,7 +26,7 @@ const stop = fsevents.watch(__dirname, (path, flags, id)=>{
 stop(); // To end observation
 ```
 
-### Callback
+#### Callback
 
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
@@ -35,7 +35,7 @@ a change in the file system. It takes three arguments:
  * `flags` - a numeric value describing what the change was
  * `id` - a unique-id identifying this specific event
 
-### `getInfo(path, flags, id) => {info-object}`
+#### `getInfo(path, flags, id) => {info-object}`
 
 The `getInfo` function takes the `path`, `flags` and `id` arguments and converts those parameters into a structure
 that is easier to digest to determine what the change was.
