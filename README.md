@@ -1,8 +1,8 @@
 # fsevents [![NPM](https://nodei.co/npm/fsevents.png)](https://nodei.co/npm/fsevents/)
 
-Native access to OS X FSEvents in [Node.js](http://nodejs.org/)
+Native access to MacOS FSEvents in [Node.js](http://nodejs.org/)
 
-The FSEvents API in OS X allows applications to register for notifications of
+The FSEvents API in MacOS allows applications to register for notifications of
 changes to a given directory tree. It is a very fast and lightweight alternative
 to kqueue.
 
@@ -20,7 +20,7 @@ uses fsevents, check out [Chokidar](https://www.npmjs.com/package/chokidar).
 
 ```js
 const fsevents = require('fsevents');
-let stop = fsevents.watch(__dirname, (path, flags, id)=>{
+const stop = fsevents.watch(__dirname, (path, flags, id)=>{
   const info = fsevents.getInfo(path, flags, id);
 }); // To start observation
 stop(); // To end observation
