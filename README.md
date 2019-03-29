@@ -28,31 +28,35 @@ stop(); // To end observation
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
 
-`(path, flags, id) => {}`
+`(path: String, flags: Number, id: String) => {}`
 
- * `path` - which is a string naming the path of the item in the filesystem that changed
+ * `path` - the item in the filesystem that have been changed
  * `flags` - a numeric value describing what the change was
- * `id` - a unique-id identifying this specific event
+ * `id` - an unique-id identifying this specific event
 
 ###### `fsevents.getInfo(path, flags, id): FsEventInfo => {}`
 
 The `getInfo` function takes the `path`, `flags` and `id` arguments and converts those parameters into a structure
 that is easier to digest to determine what the change was.
 
-The `FsEventInfo` has the following shape:
+The `FsEventsInfo` has the following shape:
 
 ```js
+/**
+ * @typedef {'created'|'modified'|'deleted'|'moved'|'root-changed'|'unknown'} FsEventsEvent
+ * @typedef {'file'|'directory'|'symlink'} FsEventsType
+ */
 {
-  "event": "<created|modified|deleted|moved|root-changed|unknown>",
-  "path": "<path-that-this-is-about>",
-  "type": "<file|directory|symlink>",
+  "event": "created",
+  "path": "file.txt",
+  "type": "file", // {}
   "changes": {
     "inode": true,   // Had iNode Meta-Information changed
     "finder": false, // Had Finder Meta-Data changed
     "access": false, // Had access permissions changed
     "xattrs": false  // Had xAttributes changed
   },
-  "flags": <raw-flags>
+  "flags": 0x100000000
 }
 ```
 
