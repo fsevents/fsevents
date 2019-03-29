@@ -1,13 +1,13 @@
 {
   "name": "fsevents",
-  "version": "2.0.2",
+  "version": "2.0.3-pre",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "os": [
     "darwin"
   ],
   "engines": {
-    "node": "^10.6.0 || >=11.0.0"
+    "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
   },
   "scripts": {
     "clean": "node-gyp clean && rm -f fsevents.node",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/strongloop/fsevents.git"
+    "url": "https://github.com/fsevents/fsevents.git"
   },
   "keywords": [
     "fsevents",
@@ -43,8 +43,8 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/strongloop/fsevents/issues"
+    "url": "https://github.com/fsevents/fsevents/issues"
   },
-  "homepage": "https://github.com/strongloop/fsevents",
+  "homepage": "https://github.com/fsevents/fsevents",
   "devDependencies": {}
 }
