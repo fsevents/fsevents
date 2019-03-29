@@ -1,5 +1,5 @@
 const native = require('../fsevents.node');
-const { mkdir, rm, rmrf, touch, rename } = require('./utils/fs.js');
+const { mkdir, rm, touch, rename } = require('./utils/fs.js');
 const { run, sleep } = require('./utils/misc.js');
 const path = require('path');
 const assert = require('assert');

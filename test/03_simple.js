@@ -6,7 +6,7 @@
 /* jshint node:true */
 'use strict';
 
-const { mkdir, rm, rmrf, touch, rename } = require('./utils/fs.js');
+const { rm, touch, rename } = require('./utils/fs.js');
 const { sleep, capture, run } = require('./utils/misc.js');
 
 const path = require('path');

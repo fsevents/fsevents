@@ -1,16 +1,11 @@
-exports.sleep = (ms)=>{
-  return new Promise((resolve)=>{
-    setTimeout(()=>resolve(), ms);
-  });
-};
-
+exports.sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 exports.capture = () => {
   const events = [];
   events.callback = (...args) => events.push(args);
   return events;
 };
 
-exports.run = async (test)=>{
+exports.run = async (test) => {
   try {
     await test();
     process.exit(0);
