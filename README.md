@@ -48,8 +48,8 @@ The `FsEventsInfo` has the following shape:
  */
 {
   "event": "created",
-  "path": "file.txt",
-  "type": "file", // {}
+  "path": "file.txt", // {FsEventsEvent}
+  "type": "file",    // {FsEventsType}
   "changes": {
     "inode": true,   // Had iNode Meta-Information changed
     "finder": false, // Had Finder Meta-Data changed
