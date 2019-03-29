@@ -11,6 +11,7 @@ if (process.platform !== 'darwin') {
 }
 
 const Native = require('./fsevents.node');
+const con = Native.constants;
 
 function watch(path, handler) {
   if ('string' !== typeof path) throw new TypeError(`argument 1 must be a string and not a ${typeof path}`);
@@ -18,7 +19,7 @@ function watch(path, handler) {
 
 
   let instance = Native.start(path, handler);
-  return ()=>{
+  return () => {
     const result = instance ? Promise.resolve(instance).then(Native.stop) : null;
     instance = null;
     return result;
@@ -32,29 +33,30 @@ function getInfo(path, flags) {
     changes: getFileChanges(flags)
   };
 }
+
 function getFileType(flags) {
-  if (Native.constants.kFSEventStreamEventFlagItemIsFile & flags) return 'file';
-  if (Native.constants.kFSEventStreamEventFlagItemIsDir & flags) return 'directory';
-  if (Native.constants.kFSEventStreamEventFlagItemIsSymlink & flags) return 'symlink';
+  if (con.kFSEventStreamEventFlagItemIsFile & flags) return 'file';
+  if (con.kFSEventStreamEventFlagItemIsDir & flags) return 'directory';
+  if (con.kFSEventStreamEventFlagItemIsSymlink & flags) return 'symlink';
 }
 function getEventType(flags) {
-  if (Native.constants.kFSEventStreamEventFlagItemRemoved & flags) return 'deleted';
-  if (Native.constants.kFSEventStreamEventFlagItemRenamed & flags) return 'moved';
-  if (Native.constants.kFSEventStreamEventFlagItemCreated & flags) return 'created';
-  if (Native.constants.kFSEventStreamEventFlagItemModified & flags) return 'modified';
-  if (Native.constants.kFSEventStreamEventFlagRootChanged & flags) return 'root-changed';
+  if (con.kFSEventStreamEventFlagItemRemoved & flags) return 'deleted';
+  if (con.kFSEventStreamEventFlagItemRenamed & flags) return 'moved';
+  if (con.kFSEventStreamEventFlagItemCreated & flags) return 'created';
+  if (con.kFSEventStreamEventFlagItemModified & flags) return 'modified';
+  if (con.kFSEventStreamEventFlagRootChanged & flags) return 'root-changed';
 
   return 'unknown';
 }
 function getFileChanges(flags) {
   return {
-    inode: !!(Native.constants.kFSEventStreamEventFlagItemInodeMetaMod & flags),
-    finder: !!(Native.constants.kFSEventStreamEventFlagItemFinderInfoMod & flags),
-    access: !!(Native.constants.kFSEventStreamEventFlagItemChangeOwner & flags),
-    xattrs: !!(Native.constants.kFSEventStreamEventFlagItemXattrMod & flags)
+    inode: !!(con.kFSEventStreamEventFlagItemInodeMetaMod & flags),
+    finder: !!(con.kFSEventStreamEventFlagItemFinderInfoMod & flags),
+    access: !!(con.kFSEventStreamEventFlagItemChangeOwner & flags),
+    xattrs: !!(con.kFSEventStreamEventFlagItemXattrMod & flags)
   };
 }
 
 exports.watch = watch;
 exports.getInfo = getInfo;
-exports.constants = Native.constants;
+exports.constants = con;
