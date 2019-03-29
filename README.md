@@ -19,7 +19,7 @@ npm install fsevents
 
 ```js
 const fsevents = require('fsevents');
-const stop = fsevents.watch(__dirname, (path, flags, id)=>{
+const stop = fsevents.watch(__dirname, (path, flags, id) => {
   const info = fsevents.getInfo(path, flags, id);
 }); // To start observation
 stop(); // To end observation
@@ -29,6 +29,8 @@ stop(); // To end observation
 
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
+
+`(path, flags, id) => {}`
 
  * `path` - which is a string naming the path of the item in the filesystem that changed
  * `flags` - a numeric value describing what the change was
@@ -43,14 +45,14 @@ The `info-object` has the following shape:
 
 ```js
 {
-  "event": "<deleted|moved|created|modified|root-changed|unknown>",
+  "event": "<created|modified|deleted|moved|root-changed|unknown>",
   "path": "<path-that-this-is-about>",
   "type": "<file|directory|symlink>",
   "changes": {
-    "inode": true, // Has the iNode Meta-Information changed
-    "finder": false, // Has the Finder Meta-Data changed
-    "access": false, // Have the access permissions changed
-    "xattrs": false // Have the xAttributes changed
+    "inode": true,   // Had iNode Meta-Information changed
+    "finder": false, // Had Finder Meta-Data changed
+    "access": false, // Had access permissions changed
+    "xattrs": false  // Had xAttributes changed
   },
   "flags": <raw-flags>
 }
