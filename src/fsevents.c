@@ -4,8 +4,8 @@
 */
 
 #include <assert.h>
-#define NAPI_VERSION 3
-#define NAPI_EXPERIMENTAL
+
+#define NAPI_VERSION 4
 #include <node_api.h>
 
 #include "rawfsevents.h"
