@@ -17,8 +17,11 @@ function watch(path, handler) {
   if ('string' !== typeof path) throw new TypeError(`argument 1 must be a string and not a ${typeof path}`);
   if ('function' !== typeof handler) throw new TypeError(`argument 2 must be a function and not a ${typeof handler}`);
 
-
-  let instance = Native.start(path, handler);
+  let instance;
+  do {
+    instance = Native.start(path, handler);
+  } while (!instance);
+  if (!instance) throw new Error(`could not watch: ${path}`);
   return () => {
     const result = instance ? Promise.resolve(instance).then(Native.stop) : null;
     instance = null;
