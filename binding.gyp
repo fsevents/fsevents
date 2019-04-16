@@ -6,6 +6,7 @@
         "sources": [ "src/fsevents.c", "src/rawfsevents.c" ],
         "xcode_settings": {
           "OTHER_LDFLAGS": [
+            "-Wl,-bind_at_load",
             "-framework CoreFoundation -framework CoreServices"
           ]
         }
