@@ -1,6 +1,6 @@
 {
   "name": "fsevents",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "os": [
@@ -11,7 +11,6 @@
   },
   "scripts": {
     "clean": "node-gyp clean && rm -f fsevents.node",
-    "install": "[ -f fsevents.node ] || npm run prepublishOnly",
     "test": "/bin/bash ./test.sh 2>/dev/null",
     "prepublishOnly": "node-gyp clean && rm -f fsevents.node && node-gyp rebuild && node-gyp clean"
   },
