@@ -116,7 +116,7 @@ void fse_watch(const char *path, fse_event_handler_t handler, void *context, fse
   CFRunLoopPerformBlock(fsevents.loop, kCFRunLoopDefaultMode, ^(void){
     if (hookstart) hookstart(watcher->context);
     FSEventStreamContext streamcontext = { 0, watcher, NULL, NULL, NULL };
-  CFStringRef dirs[] = { CFStringCreateWithCString(NULL, watcher->path, kCFStringEncodingUTF8) };
+    CFStringRef dirs[] = { CFStringCreateWithCString(NULL, watcher->path, kCFStringEncodingUTF8) };
     watcher->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), kFSEventStreamEventIdSinceNow, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
     FSEventStreamScheduleWithRunLoop(watcher->stream, fsevents.loop, kCFRunLoopDefaultMode);
     FSEventStreamStart(watcher->stream);

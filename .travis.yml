@@ -24,8 +24,3 @@ script:
   - npm test
   - nvm use v11
   - npm test
-
-after_success:
-  - PUBLISH=false
-  - if [[ $TRAVIS_BRANCH == `git describe --tags --always HEAD` ]]; then PUBLISH=true; fi;
-  - if [[ $PUBLISH == true ]]; then npm run publish; fi;
