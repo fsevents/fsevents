@@ -2,18 +2,11 @@ language: objective-c
 
 before_install:
   - echo $TRAVIS_OS_NAME
-
-  # node
-  # ------------------------
-
   - export PATH=./node_modules/.bin/:$PATH
   - rm -rf ~/.nvm && git clone --depth 1 https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh
   - nvm install v10
   - nvm install v11
-
-  # publish dependencies
-  # ------------------------
 
 install:
   - nvm use v11
