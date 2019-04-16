@@ -6,7 +6,7 @@
 /* jshint node:true */
 'use strict';
 
-var test = require('tap').test;
+var test = require('./utils/run').test;
 
 test('checking main module', function(t) {
   var mod = load('../');

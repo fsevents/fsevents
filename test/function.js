@@ -8,7 +8,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var test = require('tap').test;
+var test = require('./utils/run').test;
 
 test('functionality testing', function(t) {
   try {
