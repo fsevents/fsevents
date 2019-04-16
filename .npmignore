@@ -5,3 +5,8 @@ package-lock.json
 build/
 node_modules/
 .vscode/
+src/
+test/
+ISSUE_TEMPLATE.md
+binding.gyp
+*.sh
