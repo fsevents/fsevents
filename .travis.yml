@@ -11,8 +11,6 @@ env:
     - NODE_VERSION="v8"
     - NODE_VERSION="v7"
     - NODE_VERSION="v6"
-    - NODE_VERSION="v5"
-    - NODE_VERSION="v4"
 
 before_install:
 
