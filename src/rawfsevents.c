@@ -113,11 +113,11 @@ void fse_watch(const char *path, fse_event_handler_t handler, void *context, fse
   strncpy(watcher->path, path, PATH_MAX);
   watcher->handler = handler;
   watcher->context = context;
-  FSEventStreamContext streamcontext = { 0, watcher, NULL, NULL, NULL };
-  CFStringRef dirs[] = { CFStringCreateWithCString(NULL, watcher->path, kCFStringEncodingUTF8) };
-  watcher->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), kFSEventStreamEventIdSinceNow, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
   CFRunLoopPerformBlock(fsevents.loop, kCFRunLoopDefaultMode, ^(void){
     if (hookstart) hookstart(watcher->context);
+    FSEventStreamContext streamcontext = { 0, watcher, NULL, NULL, NULL };
+    CFStringRef dirs[] = { CFStringCreateWithCString(NULL, watcher->path, kCFStringEncodingUTF8) };
+    watcher->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), kFSEventStreamEventIdSinceNow, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
     FSEventStreamScheduleWithRunLoop(watcher->stream, fsevents.loop, kCFRunLoopDefaultMode);
     FSEventStreamStart(watcher->stream);
   });
@@ -132,12 +132,14 @@ void fse_unwatch(fse_watcher_t watcher) {
   fse_clear(watcher);
 
   pthread_mutex_lock(&fsevents.lock);
-  if (fsevents.loop && stream) {
+  if (fsevents.loop) {
     CFRunLoopPerformBlock(fsevents.loop, kCFRunLoopDefaultMode, ^(void){
-      FSEventStreamStop(stream);
-      FSEventStreamUnscheduleFromRunLoop(stream, fsevents.loop, kCFRunLoopDefaultMode);
-      FSEventStreamInvalidate(stream);
-      FSEventStreamRelease(stream);
+      if (stream) {
+        FSEventStreamStop(stream);
+        FSEventStreamUnscheduleFromRunLoop(stream, fsevents.loop, kCFRunLoopDefaultMode);
+        FSEventStreamInvalidate(stream);
+        FSEventStreamRelease(stream);
+      }
       if (hookend) hookend(context);
     });
   }

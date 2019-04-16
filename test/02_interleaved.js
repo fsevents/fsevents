@@ -9,7 +9,7 @@ const DIR = process.argv[2];
 run(async () => {
   await mkdir(`${DIR}/A`);
   await mkdir(`${DIR}/B`);
-  await sleep(500);
+  await sleep(100);
   const events = [];
 
   const listenerA = native.start(`${DIR}/A`, (...args) => events.push(args));
