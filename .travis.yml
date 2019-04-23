@@ -7,10 +7,10 @@ before_install:
   - source ~/.nvm/nvm.sh
   - nvm install v8
   - nvm install v10
-  - nvm install v11
+  - nvm install v12
 
 install:
-  - nvm use v11
+  - nvm use v12
   - npm install
 
 script:
@@ -18,5 +18,5 @@ script:
   - npm test
   - nvm use v10
   - npm test
-  - nvm use v11
+  - nvm use v12
   - npm test
