@@ -1,4 +1,5 @@
 const fs = require('fs');
+const utils = require('util');
 const path = require('path');
 
 exports.rmrf = async (file) => {
@@ -26,14 +27,15 @@ exports.rm = async (file, stat) => {
   });
 };
 exports.readdir = async (dir) => {
-  const files = await fs.promises.readdir(dir);
+  const files = await utils.promisify(fs.readdir)(dir);
   return files.map((child) => path.join(file, child));
 };
-exports.stat = fs.promises.stat;
-exports.mkdir = fs.promises.mkdir;
-exports.write = fs.promises.writeFile;
-exports.read = fs.promises.readFile;
-exports.chmod = fs.promises.chmod
+exports.stat = utils.promisify(fs.stat);
+exports.mkdir = utils.promisify(fs.mkdir);
+exports.write = utils.promisify(fs.writeFile);
+exports.read = utils.promisify(fs.readFile);
+exports.chmod = utils.promisify(fs.chmod);
+exports.rename = utils.promisify(fs.rename);
 exports.touch = async (file) => {
   try {
     await exports.stat(file);
@@ -48,4 +50,4 @@ exports.touch = async (file) => {
     });
   });
 };
-exports.rename = fs.promises.rename;
+
