@@ -79,15 +79,10 @@ void FSEvents::Initialize(v8::Local<v8::Object> exports) {
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(FSEvents::New);
   tpl->SetClassName(Nan::New<v8::String>("FSEvents").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
-  tpl->PrototypeTemplate()->Set(
-           Nan::New<v8::String>("start").ToLocalChecked(),
-           Nan::New<v8::FunctionTemplate>(FSEvents::Start));
-  tpl->PrototypeTemplate()->Set(
-           Nan::New<v8::String>("stop").ToLocalChecked(),
-           Nan::New<v8::FunctionTemplate>(FSEvents::Stop));
-  exports->Set(context, Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
-  exports->Set(context, Nan::New<v8::String>("FSEvents").ToLocalChecked(),
-               tpl->GetFunction(context).ToLocalChecked());
+  Nan::SetPrototypeTemplate(tpl, "start", Nan::New<v8::FunctionTemplate>(FSEvents::Start));
+  Nan::SetPrototypeTemplate(tpl, "stop", Nan::New<v8::FunctionTemplate>(FSEvents::Stop));
+  Nan::Set(exports, Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
+  Nan::Set(exports, Nan::New<v8::String>("FSEvents").ToLocalChecked(), tpl->GetFunction(context).ToLocalChecked());
 }
 
 NODE_MODULE(fse, FSEvents::Initialize)
