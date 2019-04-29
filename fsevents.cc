@@ -40,7 +40,7 @@ namespace fse {
     // Common
     CFArrayRef paths;
     std::vector<fse_event*> events;
-    static void Initialize(v8::Handle<v8::Object> exports);
+    static void Initialize(v8::Local<v8::Object> exports);
 
     // methods.cc - exposed
     static NAN_METHOD(New);
@@ -73,7 +73,7 @@ FSEvents::~FSEvents() {
 #include "src/constants.cc"
 #include "src/methods.cc"
 
-void FSEvents::Initialize(v8::Handle<v8::Object> exports) {
+void FSEvents::Initialize(v8::Local<v8::Object> exports) {
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(FSEvents::New);
   tpl->SetClassName(Nan::New<v8::String>("FSEvents").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
