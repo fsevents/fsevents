@@ -74,6 +74,8 @@ FSEvents::~FSEvents() {
 #include "src/methods.cc"
 
 void FSEvents::Initialize(v8::Local<v8::Object> exports) {
+  v8::Isolate* isolate = exports->GetIsolate();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(FSEvents::New);
   tpl->SetClassName(Nan::New<v8::String>("FSEvents").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
@@ -83,9 +85,9 @@ void FSEvents::Initialize(v8::Local<v8::Object> exports) {
   tpl->PrototypeTemplate()->Set(
            Nan::New<v8::String>("stop").ToLocalChecked(),
            Nan::New<v8::FunctionTemplate>(FSEvents::Stop));
-  exports->Set(Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
-  exports->Set(Nan::New<v8::String>("FSEvents").ToLocalChecked(),
-               tpl->GetFunction());
+  exports->Set(context, Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
+  exports->Set(context, Nan::New<v8::String>("FSEvents").ToLocalChecked(),
+               tpl->GetFunction(context).ToLocalChecked());
 }
 
 NODE_MODULE(fse, FSEvents::Initialize)
