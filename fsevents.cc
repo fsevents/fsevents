@@ -40,7 +40,7 @@ namespace fse {
     // Common
     CFArrayRef paths;
     std::vector<fse_event*> events;
-    static void Initialize(v8::Handle<v8::Object> exports);
+    static void Initialize(v8::Local<v8::Object> exports);
 
     // methods.cc - exposed
     static NAN_METHOD(New);
@@ -73,19 +73,16 @@ FSEvents::~FSEvents() {
 #include "src/constants.cc"
 #include "src/methods.cc"
 
-void FSEvents::Initialize(v8::Handle<v8::Object> exports) {
+void FSEvents::Initialize(v8::Local<v8::Object> exports) {
+  v8::Isolate* isolate = exports->GetIsolate();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(FSEvents::New);
   tpl->SetClassName(Nan::New<v8::String>("FSEvents").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
-  tpl->PrototypeTemplate()->Set(
-           Nan::New<v8::String>("start").ToLocalChecked(),
-           Nan::New<v8::FunctionTemplate>(FSEvents::Start));
-  tpl->PrototypeTemplate()->Set(
-           Nan::New<v8::String>("stop").ToLocalChecked(),
-           Nan::New<v8::FunctionTemplate>(FSEvents::Stop));
-  exports->Set(Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
-  exports->Set(Nan::New<v8::String>("FSEvents").ToLocalChecked(),
-               tpl->GetFunction());
+  Nan::SetPrototypeTemplate(tpl, "start", Nan::New<v8::FunctionTemplate>(FSEvents::Start));
+  Nan::SetPrototypeTemplate(tpl, "stop", Nan::New<v8::FunctionTemplate>(FSEvents::Stop));
+  Nan::Set(exports, Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
+  Nan::Set(exports, Nan::New<v8::String>("FSEvents").ToLocalChecked(), tpl->GetFunction(context).ToLocalChecked());
 }
 
 NODE_MODULE(fse, FSEvents::Initialize)
