@@ -25,6 +25,4 @@ run(async ()=>{
   assert.equal('created', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemCreated).event);
   assert.equal('modified', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemModified).event);
   assert.equal('root-changed', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagRootChanged).event);
-
-  assert.deepEqual()
 });

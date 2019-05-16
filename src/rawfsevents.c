@@ -71,7 +71,9 @@ void fse_handle_events(
   for (idx=0; idx < numEvents; idx++) {
     fse_event_t *event = &events[idx];
     CFStringRef path = (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
-    strncpy(event->path, CFStringGetCStringPtr(path, kCFStringEncodingUTF8), sizeof(event->path));
+    if (!CFStringGetCString(path, event->path, PATH_MAX, kCFStringEncodingUTF8)) {
+      event->path[0] = 0;
+    }
     event->id = eventIds[idx];
     event->flags = eventFlags[idx];
   }

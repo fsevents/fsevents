@@ -19,7 +19,6 @@
 #endif
 #endif
 
-
 typedef struct {
   size_t count;
   fse_event_t *events;
