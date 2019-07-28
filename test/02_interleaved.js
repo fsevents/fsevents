@@ -13,11 +13,11 @@ run(async () => {
   await sleep(100);
   const events = [];
 
-  const listenerA = native.start(`${DIR}/A`, (...args) => events.push(args));
+  const listenerA = native.start(`${DIR}/A`, 0, (...args) => events.push(args));
 
   await touch(path.join(`${DIR}/A`, 'created'));
   await sleep(500);
-  const listenerB = native.start(`${DIR}/B`, (...args) => events.push(args));
+  const listenerB = native.start(`${DIR}/B`, 0, (...args) => events.push(args));
   await sleep(500);
   native.stop(listenerA);
   await rename(path.join(`${DIR}/A`, 'created'), path.join(`${DIR}/B`, 'renamed'));

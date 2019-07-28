@@ -69,17 +69,19 @@ void fse_watcher_ended(void *context) {
 }
 
 static napi_value FSEStart(napi_env env, napi_callback_info info) {
-  size_t argc = 2;
+  size_t argc = 3;
   napi_value argv[argc];
   char path[PATH_MAX];
+  int64_t since;
   napi_threadsafe_function callback = NULL;
   napi_value asyncResource, asyncName;
 
   CHECK(napi_get_cb_info(env, info, &argc, argv,  NULL, NULL) == napi_ok);
   CHECK(napi_get_value_string_utf8(env, argv[0], path, PATH_MAX, &argc) == napi_ok);
+  CHECK(napi_get_value_int64(env, argv[1], &since) == napi_ok);
   CHECK(napi_create_object(env, &asyncResource) == napi_ok);
   CHECK(napi_create_string_utf8(env, "fsevents", NAPI_AUTO_LENGTH, &asyncName) == napi_ok);
-  CHECK(napi_create_threadsafe_function(env, argv[1], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_events, &callback) == napi_ok);
+  CHECK(napi_create_threadsafe_function(env, argv[2], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_events, &callback) == napi_ok);
   CHECK(napi_ref_threadsafe_function(env, callback) == napi_ok);
 
   napi_value result;
@@ -89,7 +91,7 @@ static napi_value FSEStart(napi_env env, napi_callback_info info) {
   }
   fse_watcher_t watcher = fse_alloc();
   CHECK(watcher);
-  fse_watch(path, fse_propagate_event, callback, fse_watcher_started, fse_watcher_ended, watcher);
+  fse_watch(path, since, fse_propagate_event, callback, fse_watcher_started, fse_watcher_ended, watcher);
 
   CHECK(napi_create_external(env, watcher, fse_free_watcher, callback, &result) == napi_ok);
   return result;

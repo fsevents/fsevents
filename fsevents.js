@@ -13,11 +13,19 @@ if (process.platform !== 'darwin') {
 const Native = require('./fsevents.node');
 const con = Native.constants;
 
-function watch(path, handler) {
-  if ('string' !== typeof path) throw new TypeError(`argument 1 must be a string and not a ${typeof path}`);
-  if ('function' !== typeof handler) throw new TypeError(`argument 2 must be a function and not a ${typeof handler}`);
+function watch(path, since, handler) {
+  let argc = 3;
+  if ('function' === typeof since && handler === undefined) {
+    handler = since;
+    since = 0;
+    argc = 2
+  }
 
-  let instance = Native.start(path, handler);
+  if ('string' !== typeof path) throw new TypeError(`argument 1 must be a string and not a ${typeof path}`);
+  if ('number' !== typeof since) throw new TypeError(`argument 2 must be a number and not a ${typeof since}`)
+  if ('function' !== typeof handler) throw new TypeError(`argument ${argc} must be a function and not a ${typeof handler}`);
+
+  let instance = Native.start(path, since, handler);
   if (!instance) throw new Error(`could not watch: ${path}`);
   return () => {
     const result = instance ? Promise.resolve(instance).then(Native.stop) : null;

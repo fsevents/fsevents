@@ -9,7 +9,7 @@ const DIR = fs.realpathSync(process.argv[2]);
 
 run(async () => {
   const events = [];
-  const listener = native.start(DIR, (...args) => events.push(args));
+  const listener = native.start(DIR, 0, (...args) => events.push(args));
 
   await touch(path.join(DIR, 'created'));
   await sleep(250);

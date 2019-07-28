@@ -104,7 +104,11 @@ void fse_free(fse_watcher_t watcher) {
   free(watcher);
 }
 
-void fse_watch(const char *path, fse_event_handler_t handler, void *context, fse_thread_hook_t hookstart, fse_thread_hook_t hookend, fse_watcher_t watcher) {
+void fse_watch(const char *path, int64_t since, fse_event_handler_t handler, void *context, fse_thread_hook_t hookstart, fse_thread_hook_t hookend, fse_watcher_t watcher) {
+  if (since == 0) {
+    since = kFSEventStreamEventIdSinceNow;
+  }
+
   pthread_mutex_lock(&fsevents.lock);
   if (!fsevents.loop) {
     pthread_create(&fsevents.thread, NULL, fse_run_loop, NULL);
@@ -119,7 +123,7 @@ void fse_watch(const char *path, fse_event_handler_t handler, void *context, fse
     if (hookstart) hookstart(watcher->context);
     FSEventStreamContext streamcontext = { 0, watcher, NULL, NULL, NULL };
     CFStringRef dirs[] = { CFStringCreateWithCString(NULL, watcher->path, kCFStringEncodingUTF8) };
-    watcher->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), kFSEventStreamEventIdSinceNow, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
+    watcher->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime) 0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
     FSEventStreamScheduleWithRunLoop(watcher->stream, fsevents.loop, kCFRunLoopDefaultMode);
     FSEventStreamStart(watcher->stream);
   });

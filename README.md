@@ -19,11 +19,14 @@ npm install fsevents
 
 ```js
 const fsevents = require('fsevents');
-const stop = fsevents.watch(__dirname, (path, flags, id) => {
+const stop = fsevents.watch(__dirname [,since],(path, flags, id) => {
   const info = fsevents.getInfo(path, flags, id);
 }); // To start observation
 stop(); // To end observation
 ```
+
+Optional second parameter `since` which can be 0 (the default), meaning to return any changes from now going
+forward. Or a previous event `id`, see below.
 
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
