@@ -6,13 +6,14 @@
 /* jshint node:true */
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const fsevents = require('../fsevents');
 const { run, sleep } = require('./utils/misc.js');
 const { touch } = require('./utils/fs.js');
 
-const DIR = process.argv[2];
+const DIR = fs.realpathSync(process.argv[2]);
 
 run(async ()=>{
   const events = [];

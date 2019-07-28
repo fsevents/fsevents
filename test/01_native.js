@@ -1,10 +1,11 @@
 const native = require('../fsevents.node');
 const { rm, touch, rename } = require('./utils/fs.js');
 const { run, sleep } = require('./utils/misc.js');
+const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const DIR = process.argv[2];
+const DIR = fs.realpathSync(process.argv[2]);
 
 run(async () => {
   const events = [];
