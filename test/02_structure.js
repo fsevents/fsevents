@@ -1,7 +1,7 @@
 /*
-** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
-** Licensed under MIT License.
-*/
+ ** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
+ ** Licensed under MIT License.
+ */
 
 /* jshint node:true */
 'use strict';
@@ -10,7 +10,7 @@ const assert = require('assert');
 const fsevents = require('../fsevents');
 const { run } = require('./utils/misc.js');
 
-run(async ()=>{
+run(async () => {
   assert.equal('object', typeof fsevents);
   assert.equal('function', typeof fsevents.watch);
   assert.equal('function', typeof fsevents.getInfo);

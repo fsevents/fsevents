@@ -1,7 +1,7 @@
 /*
-** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
-** Licensed under MIT License.
-*/
+ ** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar, Paul Miller
+ ** Licensed under MIT License.
+ */
 
 /* jshint node:true */
 'use strict';
@@ -17,8 +17,10 @@ const events = Object.keys(Native.constants).reduce((obj, name) => {
 }, {});
 
 function watch(path, handler) {
-  if ('string' !== typeof path) throw new TypeError(`fsevents argument 1 must be a string and not a ${typeof path}`);
-  if ('function' !== typeof handler) throw new TypeError(`fsevents argument 2 must be a function and not a ${typeof handler}`);
+  if (typeof path !== 'string')
+    throw new TypeError(`fsevents argument 1 must be a string and not a ${typeof path}`);
+  if (typeof handler !== 'function')
+    throw new TypeError(`fsevents argument 2 must be a function and not a ${typeof handler}`);
 
   let instance = Native.start(path, handler);
   if (!instance) throw new Error(`could not watch: ${path}`);
@@ -30,7 +32,8 @@ function watch(path, handler) {
 }
 function getInfo(path, flags) {
   return {
-    path, flags,
+    path,
+    flags,
     event: getEventType(flags),
     type: getFileType(flags),
     changes: getFileChanges(flags)
