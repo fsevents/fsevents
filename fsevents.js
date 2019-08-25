@@ -30,6 +30,7 @@ function watch(path, handler) {
     return result;
   };
 }
+
 function getInfo(path, flags) {
   return {
     path,
@@ -45,13 +46,15 @@ function getFileType(flags) {
   if (events.ItemIsDir & flags) return 'directory';
   if (events.ItemIsSymlink & flags) return 'symlink';
 }
+const truthy = i => i;
 function getEventType(flags) {
   if (events.ItemRemoved & flags) return 'deleted';
   if (events.ItemRenamed & flags) return 'moved';
   if (events.ItemCreated & flags) return 'created';
   if (events.ItemModified & flags) return 'modified';
   if (events.RootChanged & flags) return 'root-changed';
-
+  if (events.ItemCloned & flags) return 'cloned';
+  if (Object.values(getFileChanges(flags)).some(truthy)) return 'modified';
   return 'unknown';
 }
 function getFileChanges(flags) {
