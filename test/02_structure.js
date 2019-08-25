@@ -16,13 +16,13 @@ run(async ()=>{
   assert.equal('function', typeof fsevents.getInfo);
   assert.equal('object', typeof fsevents.constants);
 
-  assert.equal('file', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemIsFile).type);
-  assert.equal('directory', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemIsDir).type);
-  assert.equal('symlink', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemIsSymlink).type);
+  assert.equal('file', fsevents.getInfo('path', fsevents.constants.ItemIsFile).type);
+  assert.equal('directory', fsevents.getInfo('path', fsevents.constants.ItemIsDir).type);
+  assert.equal('symlink', fsevents.getInfo('path', fsevents.constants.ItemIsSymlink).type);
 
-  assert.equal('deleted', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemRemoved).event);
-  assert.equal('moved', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemRenamed).event);
-  assert.equal('created', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemCreated).event);
-  assert.equal('modified', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagItemModified).event);
-  assert.equal('root-changed', fsevents.getInfo('path', fsevents.constants.kFSEventStreamEventFlagRootChanged).event);
+  assert.equal('deleted', fsevents.getInfo('path', fsevents.constants.ItemRemoved).event);
+  assert.equal('moved', fsevents.getInfo('path', fsevents.constants.ItemRenamed).event);
+  assert.equal('created', fsevents.getInfo('path', fsevents.constants.ItemCreated).event);
+  assert.equal('modified', fsevents.getInfo('path', fsevents.constants.ItemModified).event);
+  assert.equal('root-changed', fsevents.getInfo('path', fsevents.constants.RootChanged).event);
 });

@@ -11,11 +11,14 @@ if (process.platform !== 'darwin') {
 }
 
 const Native = require('./fsevents.node');
-const con = Native.constants;
+const events = Object.keys(Native.constants).reduce((obj, name) => {
+  obj[name.replace('kFSEventStreamEventFlag', '')] = Native.constants[name];
+  return obj;
+}, {});
 
 function watch(path, handler) {
-  if ('string' !== typeof path) throw new TypeError(`argument 1 must be a string and not a ${typeof path}`);
-  if ('function' !== typeof handler) throw new TypeError(`argument 2 must be a function and not a ${typeof handler}`);
+  if ('string' !== typeof path) throw new TypeError(`fsevents argument 1 must be a string and not a ${typeof path}`);
+  if ('function' !== typeof handler) throw new TypeError(`fsevents argument 2 must be a function and not a ${typeof handler}`);
 
   let instance = Native.start(path, handler);
   if (!instance) throw new Error(`could not watch: ${path}`);
@@ -35,28 +38,28 @@ function getInfo(path, flags) {
 }
 
 function getFileType(flags) {
-  if (con.kFSEventStreamEventFlagItemIsFile & flags) return 'file';
-  if (con.kFSEventStreamEventFlagItemIsDir & flags) return 'directory';
-  if (con.kFSEventStreamEventFlagItemIsSymlink & flags) return 'symlink';
+  if (events.ItemIsFile & flags) return 'file';
+  if (events.ItemIsDir & flags) return 'directory';
+  if (events.ItemIsSymlink & flags) return 'symlink';
 }
 function getEventType(flags) {
-  if (con.kFSEventStreamEventFlagItemRemoved & flags) return 'deleted';
-  if (con.kFSEventStreamEventFlagItemRenamed & flags) return 'moved';
-  if (con.kFSEventStreamEventFlagItemCreated & flags) return 'created';
-  if (con.kFSEventStreamEventFlagItemModified & flags) return 'modified';
-  if (con.kFSEventStreamEventFlagRootChanged & flags) return 'root-changed';
+  if (events.ItemRemoved & flags) return 'deleted';
+  if (events.ItemRenamed & flags) return 'moved';
+  if (events.ItemCreated & flags) return 'created';
+  if (events.ItemModified & flags) return 'modified';
+  if (events.RootChanged & flags) return 'root-changed';
 
   return 'unknown';
 }
 function getFileChanges(flags) {
   return {
-    inode: !!(con.kFSEventStreamEventFlagItemInodeMetaMod & flags),
-    finder: !!(con.kFSEventStreamEventFlagItemFinderInfoMod & flags),
-    access: !!(con.kFSEventStreamEventFlagItemChangeOwner & flags),
-    xattrs: !!(con.kFSEventStreamEventFlagItemXattrMod & flags)
+    inode: !!(events.ItemInodeMetaMod & flags),
+    finder: !!(events.ItemFinderInfoMod & flags),
+    access: !!(events.ItemChangeOwner & flags),
+    xattrs: !!(events.ItemXattrMod & flags)
   };
 }
 
 exports.watch = watch;
 exports.getInfo = getInfo;
-exports.constants = con;
+exports.constants = events;

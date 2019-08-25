@@ -147,6 +147,10 @@ napi_value Init(napi_env env, napi_value exports) {
   CONSTANT(kFSEventStreamEventFlagItemIsFile);
   CONSTANT(kFSEventStreamEventFlagItemIsDir);
   CONSTANT(kFSEventStreamEventFlagItemIsSymlink);
+  CONSTANT(kFSEventStreamEventFlagItemIsHardlink);
+  CONSTANT(kFSEventStreamEventFlagItemIsLastHardlink);
+  CONSTANT(kFSEventStreamEventFlagOwnEvent);
+  CONSTANT(kFSEventStreamEventFlagItemCloned);
 
   return exports;
 }
