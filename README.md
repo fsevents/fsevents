@@ -11,6 +11,8 @@ uses fsevents, check out [Chokidar](https://github.com/paulmillr/chokidar).
 
 ## Installation
 
+Supports only **Node.js v8.16 and higher**.
+
 ```sh
 npm install fsevents
 ```
