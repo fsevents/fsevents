@@ -1,7 +1,7 @@
 /*
-** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
-** Licensed under MIT License.
-*/
+ ** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
+ ** Licensed under MIT License.
+ */
 
 /* jshint node:true */
 'use strict';
@@ -15,14 +15,14 @@ const fsevents = require('../fsevents');
 
 const DIR = process.argv[2];
 
-run(async ()=>{
+run(async () => {
   const events = capture();
   const stop = fsevents.watch(DIR, events.callback);
 
   await touch(path.join(DIR, '\uD83D\uDE00'));
   await sleep(250);
   await rm(path.join(DIR, '\uD83D\uDE00'));
-  
+
   await sleep(1500);
 
   await stop();
@@ -40,11 +40,11 @@ run(async ()=>{
     }
   ];
 
-  const parsed = events.map((args) => fsevents.getInfo(...args));
-  parsed.forEach((actual, idx)=>{
+  const parsed = events.map(args => fsevents.getInfo(...args));
+  parsed.forEach((actual, idx) => {
     const expect = expected[idx];
     assert.equal(actual.path, expect.path);
     assert.equal(actual.type, expect.type);
     assert.equal(actual.event, expect.event);
-  })
+  });
 });

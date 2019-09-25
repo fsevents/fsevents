@@ -84,6 +84,22 @@
 #define kFSEventStreamEventFlagItemIsSymlink 0x00040000
 #endif
 
+#ifndef kFSEventStreamEventFlagItemIsHardlink
+#define kFSEventStreamEventFlagItemIsHardlink 0x00100000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemIsLastHardlink
+#define kFSEventStreamEventFlagItemIsLastHardlink 0x00200000
+#endif
+
+#ifndef kFSEventStreamEventFlagOwnEvent
+#define kFSEventStreamEventFlagOwnEvent 0x00080000
+#endif
+
+#ifndef kFSEventStreamEventFlagItemCloned
+#define kFSEventStreamEventFlagItemCloned 0x00400000
+#endif
+
 // constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamCreateFlags
 #ifndef kFSEventStreamCreateFlagNone
 #define kFSEventStreamCreateFlagNone 0x00000000

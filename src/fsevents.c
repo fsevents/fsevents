@@ -111,7 +111,7 @@ static napi_value FSEStop(napi_env env, napi_callback_info info) {
 }
 
 #define CONSTANT(name) do {\
-  CHECK(napi_create_int32(env, name, &value) == napi_ok);\
+  CHECK(napi_create_int32(env, kFSEventStreamEventFlag##name, &value) == napi_ok);\
   CHECK(napi_set_named_property(env, constants, #name, value) == napi_ok);\
 } while (0)
 
@@ -127,26 +127,30 @@ napi_value Init(napi_env env, napi_value exports) {
   };
   CHECK(napi_define_properties(env, exports, 3, descriptors) == napi_ok);
 
-  CONSTANT(kFSEventStreamEventFlagNone);
-  CONSTANT(kFSEventStreamEventFlagMustScanSubDirs);
-  CONSTANT(kFSEventStreamEventFlagUserDropped);
-  CONSTANT(kFSEventStreamEventFlagKernelDropped);
-  CONSTANT(kFSEventStreamEventFlagEventIdsWrapped);
-  CONSTANT(kFSEventStreamEventFlagHistoryDone);
-  CONSTANT(kFSEventStreamEventFlagRootChanged);
-  CONSTANT(kFSEventStreamEventFlagMount);
-  CONSTANT(kFSEventStreamEventFlagUnmount);
-  CONSTANT(kFSEventStreamEventFlagItemCreated);
-  CONSTANT(kFSEventStreamEventFlagItemRemoved);
-  CONSTANT(kFSEventStreamEventFlagItemInodeMetaMod);
-  CONSTANT(kFSEventStreamEventFlagItemRenamed);
-  CONSTANT(kFSEventStreamEventFlagItemModified);
-  CONSTANT(kFSEventStreamEventFlagItemFinderInfoMod);
-  CONSTANT(kFSEventStreamEventFlagItemChangeOwner);
-  CONSTANT(kFSEventStreamEventFlagItemXattrMod);
-  CONSTANT(kFSEventStreamEventFlagItemIsFile);
-  CONSTANT(kFSEventStreamEventFlagItemIsDir);
-  CONSTANT(kFSEventStreamEventFlagItemIsSymlink);
+  CONSTANT(None);
+  CONSTANT(MustScanSubDirs);
+  CONSTANT(UserDropped);
+  CONSTANT(KernelDropped);
+  CONSTANT(EventIdsWrapped);
+  CONSTANT(HistoryDone);
+  CONSTANT(RootChanged);
+  CONSTANT(Mount);
+  CONSTANT(Unmount);
+  CONSTANT(ItemCreated);
+  CONSTANT(ItemRemoved);
+  CONSTANT(ItemInodeMetaMod);
+  CONSTANT(ItemRenamed);
+  CONSTANT(ItemModified);
+  CONSTANT(ItemFinderInfoMod);
+  CONSTANT(ItemChangeOwner);
+  CONSTANT(ItemXattrMod);
+  CONSTANT(ItemIsFile);
+  CONSTANT(ItemIsDir);
+  CONSTANT(ItemIsSymlink);
+  CONSTANT(ItemIsHardlink);
+  CONSTANT(ItemIsLastHardlink);
+  CONSTANT(OwnEvent);
+  CONSTANT(ItemCloned);
 
   return exports;
 }
