@@ -45,7 +45,12 @@ function getFileType(flags) {
   if (events.ItemIsDir & flags) return 'directory';
   if (events.ItemIsSymlink & flags) return 'symlink';
 }
-const truthy = i => i;
+function anyIsTrue(obj) {
+  for (let key in obj) {
+    if (obj[key]) return true;
+  }
+  return false;
+}
 function getEventType(flags) {
   if (events.ItemRemoved & flags) return 'deleted';
   if (events.ItemRenamed & flags) return 'moved';
@@ -53,8 +58,7 @@ function getEventType(flags) {
   if (events.ItemModified & flags) return 'modified';
   if (events.RootChanged & flags) return 'root-changed';
   if (events.ItemCloned & flags) return 'cloned';
-  // TODO: debug?
-  // if (Object.values(getFileChanges(flags)).some(truthy)) return 'modified';
+  if (anyIsTrue(flags)) return 'modified';
   return 'unknown';
 }
 function getFileChanges(flags) {
