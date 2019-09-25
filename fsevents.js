@@ -11,16 +11,15 @@ if (process.platform !== 'darwin') {
 }
 
 const Native = require('./fsevents.node');
-const events = Object.keys(Native.constants).reduce((obj, name) => {
-  obj[name.replace('kFSEventStreamEventFlag', '')] = Native.constants[name];
-  return obj;
-}, {});
+const events = Native.constants;
 
 function watch(path, handler) {
-  if (typeof path !== 'string')
+  if (typeof path !== 'string') {
     throw new TypeError(`fsevents argument 1 must be a string and not a ${typeof path}`);
-  if (typeof handler !== 'function')
+  }
+  if (typeof handler !== 'function') {
     throw new TypeError(`fsevents argument 2 must be a function and not a ${typeof handler}`);
+  }
 
   let instance = Native.start(path, handler);
   if (!instance) throw new Error(`could not watch: ${path}`);
@@ -54,7 +53,8 @@ function getEventType(flags) {
   if (events.ItemModified & flags) return 'modified';
   if (events.RootChanged & flags) return 'root-changed';
   if (events.ItemCloned & flags) return 'cloned';
-  if (Object.values(getFileChanges(flags)).some(truthy)) return 'modified';
+  // TODO: debug?
+  // if (Object.values(getFileChanges(flags)).some(truthy)) return 'modified';
   return 'unknown';
 }
 function getFileChanges(flags) {
