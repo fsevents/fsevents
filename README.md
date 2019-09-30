@@ -30,7 +30,7 @@ stop(); // To end observation
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
 
-###### `fsevents.watch((path: String, flags: Number, id: String) => void) => Function`
+###### `fsevents.watch((path: String, flags: Number, id: String): void): Function`
 
  * `path` - the item in the filesystem that have been changed
  * `flags` - a numeric value describing what the change was
@@ -38,7 +38,7 @@ a change in the file system. It takes three arguments:
  
  Returns closer callback.
 
-###### `fsevents.getInfo(path, flags, id): FsEventInfo => void`
+###### `fsevents.getInfo(path, flags, id): FsEventInfo`
 
 The `getInfo` function takes the `path`, `flags` and `id` arguments and converts those parameters into a structure
 that is easier to digest to determine what the change was.
@@ -66,6 +66,6 @@ The `FsEventsInfo` has the following shape:
 
 ## License
 
-The MIT License Copyright (C) 2010-2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar — see LICENSE file.
+The MIT License Copyright (C) 2010-2019 by Philipp Dunkel, Ben Noordhuis, Elan Shankar, Paul Miller — see LICENSE file.
 
 Visit our [GitHub page](https://github.com/fsevents/fsevents) and [NPM Page](https://npmjs.org/package/fsevents)
