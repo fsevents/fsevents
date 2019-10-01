@@ -1,6 +1,6 @@
 {
   "name": "fsevents",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "description": "Native Access to MacOS FSEvents",
   "main": "fsevents.js",
   "os": [
