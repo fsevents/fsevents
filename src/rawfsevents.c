@@ -108,7 +108,7 @@ void fse_watch(const char *path, fse_event_handler_t handler, void *context, fse
   pthread_mutex_lock(&fsevents.lock);
   if (!fsevents.loop) {
     pthread_create(&fsevents.thread, NULL, fse_run_loop, NULL);
-    while(!fsevents.loop) {
+    while (!fsevents.loop) {
       pthread_cond_wait(&fsevents.init, &fsevents.lock);
     }
     pthread_mutex_unlock(&fsevents.lock);
