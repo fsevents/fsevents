@@ -64,6 +64,12 @@ The `FsEventsInfo` has the following shape:
 }
 ```
 
+## Engine compatibility
+
+- v2 supports node 8.16 and higher
+- v1.2.8 supports node v6
+- v1.2.7 supports node v4
+
 ## License
 
 The MIT License Copyright (C) 2010-2019 by Philipp Dunkel, Ben Noordhuis, Elan Shankar, Paul Miller — see LICENSE file.
