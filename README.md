@@ -66,9 +66,9 @@ The `FsEventsInfo` has the following shape:
 
 ## Engine compatibility
 
-- v2 supports node 8.16 and higher
-- v1.2.8 supports node v6
-- v1.2.7 supports node v4
+- v2 supports node 8.16+
+- v1.2.8 supports node 6+
+- v1.2.7 supports node 4+
 
 ## License
 
