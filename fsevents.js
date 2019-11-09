@@ -25,8 +25,8 @@ function watch(path, handler) {
   if (!instance) throw new Error(`could not watch: ${path}`);
   return () => {
     const result = instance
-        ? Promise.resolve(instance).then(Native.stop).then(() => undefined)
-        : Promise.resolve(undefined);
+      ? Promise.resolve(instance).then(Native.stop)
+      : Promise.resolve(undefined);
     instance = undefined;
     return result;
   };

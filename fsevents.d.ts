@@ -24,7 +24,7 @@ declare type WatchHandler = (path: string, flags: number, id: string) => void;
 export declare function watch(
     path: string,
     handler: WatchHandler,
-): () => Promise<void> | null;
+): () => Promise<void>;
 export declare function getInfo(path: string, flags: number): Info;
 export declare const constants: {
     None: 0x00000000;
