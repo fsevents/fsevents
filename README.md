@@ -47,7 +47,7 @@ The `FsEventsInfo` has the following shape:
 
 ```js
 /**
- * @typedef {'created'|'modified'|'deleted'|'moved'|'root-changed'|'unknown'} FsEventsEvent
+ * @typedef {'created'|'modified'|'deleted'|'moved'|'root-changed'|'cloned'|'unknown'} FsEventsEvent
  * @typedef {'file'|'directory'|'symlink'} FsEventsType
  */
 {
