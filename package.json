@@ -3,10 +3,15 @@
   "version": "2.1.1",
   "description": "Native Access to MacOS FSEvents",
   "main": "fsevents.js",
+  "types": "fsevents.d.ts",
   "os": [
     "darwin"
   ],
-  "files": ["fsevents.js", "fsevents.node"],
+  "files": [
+    "fsevents.d.ts",
+    "fsevents.js",
+    "fsevents.node"
+  ],
   "engines": {
     "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
   },
