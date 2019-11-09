@@ -30,7 +30,7 @@ stop(); // To end observation
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
 
-###### `fsevents.watch(dirname: string, (path: string, flags: number, id: string) => void): () => Promise<null>`
+###### `fsevents.watch(dirname: string, (path: string, flags: number, id: string) => void): () => Promise<undefined>`
 
  * `path: string` - the item in the filesystem that have been changed
  * `flags: number` - a numeric value describing what the change was
