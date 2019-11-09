@@ -30,13 +30,13 @@ stop(); // To end observation
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
 
-###### `fsevents.watch(dirname: string, (path: string, flags: number, id: string) => void): Function`
+###### `fsevents.watch(dirname: string, (path: string, flags: number, id: string) => void): () => Promise<null>`
 
  * `path: string` - the item in the filesystem that have been changed
  * `flags: number` - a numeric value describing what the change was
  * `id: string` - an unique-id identifying this specific event
- 
- Returns closer callback.
+
+ Returns closer callback which when called returns a Promise resolving when the watcher process has been shut down.
 
 ###### `fsevents.getInfo(path: string, flags: number, id: string): FsEventInfo`
 
@@ -47,7 +47,7 @@ The `FsEventsInfo` has the following shape:
 
 ```js
 /**
- * @typedef {'created'|'modified'|'deleted'|'moved'|'root-changed'|'unknown'} FsEventsEvent
+ * @typedef {'created'|'modified'|'deleted'|'moved'|'root-changed'|'cloned'|'unknown'} FsEventsEvent
  * @typedef {'file'|'directory'|'symlink'} FsEventsType
  */
 {
