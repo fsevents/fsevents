@@ -1,6 +1,6 @@
 {
   "name": "fsevents",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "description": "Native Access to Mac OS-X FSEvents",
   "main": "fsevents.js",
   "dependencies": {
@@ -11,7 +11,7 @@
     "darwin"
   ],
   "engines": {
-    "node": ">=4.0"
+    "node": ">= 4.0"
   },
   "scripts": {
     "test": "node ./test/fsevents.js && node ./test/function.js 2> /dev/null"
