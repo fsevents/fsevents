@@ -29,8 +29,5 @@
   "bugs": {
     "url": "https://github.com/strongloop/fsevents/issues"
   },
-  "bundledDependencies": [
-    "node-pre-gyp"
-  ],
   "homepage": "https://github.com/strongloop/fsevents"
 }
