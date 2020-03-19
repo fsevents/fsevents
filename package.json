@@ -6,7 +6,7 @@
   "dependencies": {
     "bindings": "^1.5.0",
     "nan": "^2.12.1",
-    "node-pre-gyp": "latest"
+    "node-pre-gyp": "^0.14.0"
   },
   "os": [
     "darwin"
