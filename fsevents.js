@@ -1,5 +1,5 @@
 /*
- ** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar, Paul Miller
+ ** © 2020 by Philipp Dunkel, Ben Noordhuis, Elan Shankar, Paul Miller
  ** Licensed under MIT License.
  */
 

@@ -1,12 +1,12 @@
 /*
- ** © 2018 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
+ ** © 2020 by Philipp Dunkel, Ben Noordhuis, Elan Shankar
  ** Licensed under MIT License.
  */
 
 /* jshint node:true */
 'use strict';
 
-const { rm, touch, rename } = require('./utils/fs.js');
+const { rm, touch } = require('./utils/fs.js');
 const { sleep, capture, run } = require('./utils/misc.js');
 
 const path = require('path');
