@@ -51,8 +51,8 @@ The `FsEventsInfo` has the following shape:
  * @typedef {'file'|'directory'|'symlink'} FsEventsType
  */
 {
-  "event": "created",
-  "path": "file.txt", // {FsEventsEvent}
+  "event": "created", // {FsEventsEvent}
+  "path": "file.txt", 
   "type": "file",    // {FsEventsType}
   "changes": {
     "inode": true,   // Had iNode Meta-Information changed
