@@ -55,5 +55,8 @@
   "bugs": {
     "url": "https://github.com/fsevents/fsevents/issues"
   },
-  "homepage": "https://github.com/fsevents/fsevents"
+  "homepage": "https://github.com/fsevents/fsevents",
+  "devDependencies": {
+    "node-gyp": "^6.1.0"
+  }
 }
