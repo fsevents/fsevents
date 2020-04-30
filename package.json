@@ -15,7 +15,8 @@
     "node": ">= 4.0"
   },
   "scripts": {
-    "test": "node ./test/fsevents.js && node ./test/function.js 2> /dev/null"
+    "test": "node ./test/fsevents.js && node ./test/function.js 2> /dev/null",
+    "install": "node install.js"
   },
   "repository": {
     "type": "git",
