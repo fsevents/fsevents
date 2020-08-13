@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const spawn = require('child_process').spawn;
 
 const rebuildIfDarwin = () => {
   if (process.platform !== 'darwin') {
