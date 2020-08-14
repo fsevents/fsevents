@@ -70,6 +70,11 @@ The `FsEventsInfo` has the following shape:
 - v1.2.8 supports node 6+
 - v1.2.7 supports node 4+
 
+## Troubleshooting
+
+- I'm getting `EBADPLATFORM` `Unsupported platform for fsevents` error.
+- It's fine, nothing is broken. fsevents is macos-only. Other platforms are skipped. If you want to hide this warning, report a bug to NPM bugtracker asking them to hide ebadplatform warnings by default.
+
 ## License
 
 The MIT License Copyright (C) 2010-2020 by Philipp Dunkel, Ben Noordhuis, Elan Shankar, Paul Miller — see LICENSE file.
