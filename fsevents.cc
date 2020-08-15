@@ -54,6 +54,7 @@ using namespace fse;
 
 FSEvents::FSEvents(const char *path)
    : async_resource("fsevents:FSEvents") {
+  memset(&async, 0, sizeof(async));
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
   threadloop = NULL;
