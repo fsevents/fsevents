@@ -8,7 +8,7 @@ const DIR = process.argv[2] || `${__dirname}/temp`;
 
 run(async () => {
   const events = [];
-  const listener = native.start(native.global, DIR, (...args) => events.push(args));
+  const listener = native.start(native.global, DIR, native.kFSEventStreamEventIdSinceNow, (...args) => events.push(args));
 
   await touch(path.join(DIR, "created"));
   await sleep(250);

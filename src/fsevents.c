@@ -84,19 +84,22 @@ void fse_watcher_ended(void *context)
 
 static napi_value FSEStart(napi_env env, napi_callback_info info)
 {
-  size_t argc = 3;
+  size_t argc = 4;
   napi_value argv[argc];
   char path[PATH_MAX];
   napi_threadsafe_function callback = NULL;
   napi_value asyncResource, asyncName;
+  int64_t since;
 
   CHECK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL) == napi_ok);
   fse_loop_t *global = NULL;
   CHECK(napi_get_value_external(env, argv[0], (void **)&global) == napi_ok);
   CHECK(napi_get_value_string_utf8(env, argv[1], path, PATH_MAX, &argc) == napi_ok);
+  CHECK(napi_get_value_int64(env, argv[2], &since) == napi_ok);
+
   CHECK(napi_create_object(env, &asyncResource) == napi_ok);
   CHECK(napi_create_string_utf8(env, "fsevents", NAPI_AUTO_LENGTH, &asyncName) == napi_ok);
-  CHECK(napi_create_threadsafe_function(env, argv[2], asyncResource, asyncName, 0, 2, NULL, NULL, global, fse_dispatch_events, &callback) == napi_ok);
+  CHECK(napi_create_threadsafe_function(env, argv[3], asyncResource, asyncName, 0, 2, NULL, NULL, global, fse_dispatch_events, &callback) == napi_ok);
   CHECK(napi_ref_threadsafe_function(env, callback) == napi_ok);
 
   napi_value result;
@@ -108,6 +111,7 @@ static napi_value FSEStart(napi_env env, napi_callback_info info)
   fse_watcher_t watcher = fse_alloc();
   CHECK(watcher);
   watcher->global = global;
+  watcher->since = since;
   fse_watch(path, fse_propagate_event, callback, fse_watcher_started, fse_watcher_ended, watcher);
   CHECK(napi_create_external(env, watcher, fse_free_watcher, callback, &result) == napi_ok);
   return result;
@@ -156,12 +160,15 @@ napi_value Init(napi_env env, napi_value exports)
   napi_value value, constants;
 
   CHECK(napi_create_object(env, &constants) == napi_ok);
+  CHECK(napi_create_int64(env, kFSEventStreamEventIdSinceNow, &value) == napi_ok);
   napi_property_descriptor descriptors[] = {
       {"global", NULL, NULL, NULL, NULL, napiglobal, napi_default, NULL},
       {"start", NULL, FSEStart, NULL, NULL, NULL, napi_default, NULL},
       {"stop", NULL, FSEStop, NULL, NULL, NULL, napi_default, NULL},
-      {"constants", NULL, NULL, NULL, NULL, constants, napi_default, NULL}};
-  CHECK(napi_define_properties(env, exports, 4, descriptors) == napi_ok);
+      {"constants", NULL, NULL, NULL, NULL, constants, napi_default, NULL},
+      {"kFSEventStreamEventIdSinceNow", NULL, NULL, NULL, NULL, value, napi_default, NULL}};
+
+  CHECK(napi_define_properties(env, exports, 5, descriptors) == napi_ok);
 
   CONSTANT(None);
   CONSTANT(MustScanSubDirs);

@@ -34,6 +34,7 @@ struct fse_watcher_s
   fse_thread_hook_t hookend;
   void *context;
   fse_loop_t *global;
+  int64_t since;
 };
 
 typedef struct fse_watcher_s *fse_watcher_t;

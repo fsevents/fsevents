@@ -12,11 +12,11 @@ run(async () => {
   await sleep(100);
   const events = [];
 
-  const listenerA = native.start(native.global, `${DIR}/A`, (...args) => events.push(args));
+  const listenerA = native.start(native.global, `${DIR}/A`, native.kFSEventStreamEventIdSinceNow, (...args) => events.push(args));
 
   await touch(path.join(`${DIR}/A`, "created"));
   await sleep(500);
-  const listenerB = native.start(native.global, `${DIR}/B`, (...args) => events.push(args));
+  const listenerB = native.start(native.global, `${DIR}/B`, native.kFSEventStreamEventIdSinceNow, (...args) => events.push(args));
   await sleep(500);
   native.stop(native.global, listenerA);
   await rename(path.join(`${DIR}/A`, "created"), path.join(`${DIR}/B`, "renamed"));
