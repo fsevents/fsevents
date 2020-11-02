@@ -2,6 +2,7 @@
 #define __constants_h
 
 #include "CoreFoundation/CoreFoundation.h"
+#include "CoreServices/CoreServices.h"
 
 // constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamEventFlags
 #ifndef kFSEventStreamEventFlagNone
