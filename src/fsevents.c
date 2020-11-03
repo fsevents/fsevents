@@ -3,130 +3,262 @@
 ** Licensed under MIT License.
 */
 
-#include <assert.h>
-
 #define NAPI_VERSION 4
 #include <node_api.h>
 
-#include "rawfsevents.h"
-#include "constants.h"
-
 #ifndef CHECK
 #ifdef NDEBUG
-#define CHECK(x) do { if (!(x)) abort(); } while (0)
+#define CHECK(x) \
+  do             \
+  {              \
+    if (!(x))    \
+      abort();   \
+  } while (0)
 #else
+#include <assert.h>
 #define CHECK assert
 #endif
 #endif
 
-typedef struct {
-  size_t count;
-  fse_event_t *events;
-} fse_js_event;
+#include "constants.h"
+#define CONSTANT(name)                                                               \
+  do                                                                                 \
+  {                                                                                  \
+    CHECK(napi_create_int32(env, kFSEventStreamEventFlag##name, &value) == napi_ok); \
+    CHECK(napi_set_named_property(env, constants, #name, value) == napi_ok);         \
+  } while (0)
 
-void fse_propagate_event(void *callback, size_t numevents, fse_event_t *events) {
-  fse_js_event *event = malloc(sizeof(*event));
-  CHECK(event);
-  event->count = numevents;
-  event->events = events;
-  CHECK(napi_call_threadsafe_function((napi_threadsafe_function)callback, event, napi_tsfn_blocking) == napi_ok);
+#include <pthread.h>
+#include <stdlib.h>
+#include <limits.h>
+
+//#include <stdio.h>
+//#define DEBUG(str, idx) printf("%s(%i)\n", str, idx);
+
+void RunLoopSourceScheduleRoutine(void *info, CFRunLoopRef loop, CFStringRef mode) {}
+void RunLoopSourcePerformRoutine(void *info) {}
+void RunLoopSourceCancelRoutine(void *info, CFRunLoopRef loop, CFStringRef mode) {}
+
+typedef struct
+{
+  pthread_t thread;
+  pthread_mutex_t lock;
+  CFRunLoopRef loop;
+  CFRunLoopSourceRef source;
+} fse_environment_t;
+void fse_environment_destroy(napi_env env, void *voidenv, void *hint)
+{
+  fse_environment_t *fseenv = voidenv;
+  CFRunLoopRemoveSource(fseenv->loop, fseenv->source, kCFRunLoopDefaultMode);
+  pthread_join(fseenv->thread, NULL);
+  fseenv->thread = NULL;
+  pthread_mutex_destroy(&fseenv->lock);
+  free(fseenv);
+}
+void *fse_run_loop(void *voidenv)
+{
+  fse_environment_t *fseenv = voidenv;
+  fseenv->loop = CFRunLoopGetCurrent();
+  CFRunLoopAddSource(fseenv->loop, fseenv->source, kCFRunLoopDefaultMode);
+  CFRunLoopPerformBlock(fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
+    pthread_mutex_unlock(&fseenv->lock);
+  });
+  CFRunLoopRun();
+  pthread_mutex_lock(&fseenv->lock);
+  fseenv->loop = NULL;
+  pthread_mutex_unlock(&fseenv->lock);
+  return NULL;
+}
+napi_value fse_environment_create(napi_env env)
+{
+  fse_environment_t *fseenv = malloc(sizeof(fse_environment_t));
+  fseenv->loop = NULL;
+
+  CFRunLoopSourceContext context = {0, NULL, NULL, NULL, NULL, NULL, NULL, &RunLoopSourceScheduleRoutine, RunLoopSourceCancelRoutine, RunLoopSourcePerformRoutine};
+  fseenv->source = CFRunLoopSourceCreate(NULL, 0, &context);
+
+  pthread_mutex_init(&fseenv->lock, NULL);
+  pthread_mutex_lock(&fseenv->lock);
+
+  fseenv->thread = NULL;
+  pthread_create(&fseenv->thread, NULL, fse_run_loop, (void *)fseenv);
+
+  pthread_mutex_lock(&fseenv->lock);
+  pthread_mutex_unlock(&fseenv->lock);
+
+  napi_value result;
+  CHECK(napi_create_external(env, fseenv, fse_environment_destroy, NULL, &result) == napi_ok);
+  return result;
 }
 
-void fse_dispatch_events(napi_env env, napi_value callback, void* context, void* data) {
-  fse_js_event *event = data;
-  napi_value recv, args[3];
-  size_t idx;
-  CHECK(napi_get_null(env, &recv) == napi_ok);
+typedef struct
+{
+  char path[PATH_MAX];
+  fse_environment_t *fseenv;
+  FSEventStreamRef stream;
+  napi_threadsafe_function callback;
+} fse_instance_t;
+typedef struct
+{
+  unsigned long long id;
+  char path[PATH_MAX];
+  unsigned int flags;
+} fse_event_t;
+typedef struct
+{
+  int length;
+  fse_event_t *events;
+} fse_events_t;
+void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
+{
+  fse_instance_t *instance = voidinst;
+  if (instance->stream)
+  {
+    pthread_mutex_lock(&instance->fseenv->lock);
+    CFRunLoopPerformBlock(instance->fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
+      FSEventStreamStop(instance->stream);
+      FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+      FSEventStreamInvalidate(instance->stream);
+      FSEventStreamRelease(instance->stream);
+      pthread_mutex_unlock(&instance->fseenv->lock);
+    });
+  }
+  pthread_mutex_lock(&instance->fseenv->lock);
+  pthread_mutex_unlock(&instance->fseenv->lock);
+  instance->stream = NULL;
 
-  for (idx = 0; idx < event->count; idx++) {
-    CHECK(napi_create_string_utf8(env, event->events[idx].path, NAPI_AUTO_LENGTH, &args[0]) == napi_ok);
-    CHECK(napi_create_uint32(env, event->events[idx].flags, &args[1]) == napi_ok);
-    CHECK(napi_create_int64(env, event->events[idx].id, &args[2]) == napi_ok);
+  if (instance->callback)
+  {
+    CHECK(napi_unref_threadsafe_function(env, instance->callback) == napi_ok);
+    CHECK(napi_release_threadsafe_function(instance->callback, napi_tsfn_abort) == napi_ok);
+    instance->callback = NULL;
+  }
+
+  free(instance);
+}
+void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *data)
+{
+  fse_events_t *events = data;
+  int argc = 3, idx = 0;
+  napi_value args[argc];
+  for (idx = 0; idx < events->length; idx++)
+  {
+    CHECK(napi_create_string_utf8(env, events->events[idx].path, NAPI_AUTO_LENGTH, &args[0]) == napi_ok);
+    CHECK(napi_create_uint32(env, events->events[idx].flags, &args[1]) == napi_ok);
+    CHECK(napi_create_int64(env, events->events[idx].id, &args[2]) == napi_ok);
+    napi_value recv;
+    CHECK(napi_get_null(env, &recv) == napi_ok);
     CHECK(napi_call_function(env, recv, callback, 3, args, &recv) == napi_ok);
   }
-
-  free(event->events);
-  free(event);
+  free(events->events);
+  free(events);
 }
-
-void fse_free_watcher(napi_env env, void* watcher, void* callback) {
-  fse_free(watcher);
-}
-
-void fse_watcher_started(void *context) {
-  if (context == NULL) {
+void fse_handle_events(
+    ConstFSEventStreamRef stream,
+    void *data,
+    size_t numEvents,
+    void *eventPaths,
+    const FSEventStreamEventFlags eventFlags[],
+    const FSEventStreamEventId eventIds[])
+{
+  fse_instance_t *instance = data;
+  if (!instance->callback)
+  {
     return;
   }
-  napi_threadsafe_function callback = (napi_threadsafe_function)context;
-  CHECK(napi_acquire_threadsafe_function(callback) == napi_ok);
-}
-void fse_watcher_ended(void *context) {
-  if (context == NULL) {
-    return;
-  }
-  napi_threadsafe_function callback = (napi_threadsafe_function)context;
-  CHECK(napi_release_threadsafe_function(callback, napi_tsfn_abort) == napi_ok);
-}
 
-static napi_value FSEStart(napi_env env, napi_callback_info info) {
-  size_t argc = 2;
+  fse_events_t *events = malloc(sizeof(fse_events_t));
+  events->length = numEvents;
+  events->events = malloc(numEvents * sizeof(fse_event_t));
+  size_t idx;
+  for (idx = 0; idx < numEvents; idx++)
+  {
+    CFStringRef path = (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
+    if (!CFStringGetCString(path, events->events[idx].path, PATH_MAX, kCFStringEncodingUTF8))
+    {
+      events->events[idx].path[0] = 0;
+    }
+    events->events[idx].id = eventIds[idx];
+    events->events[idx].flags = eventFlags[idx];
+  }
+  CHECK(napi_call_threadsafe_function(instance->callback, events, napi_tsfn_blocking) == napi_ok);
+}
+napi_value FSEStart(napi_env env, napi_callback_info info)
+{
+  size_t argc = 4;
   napi_value argv[argc];
+  CHECK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL) == napi_ok);
+
+  fse_instance_t *instance = malloc(sizeof(fse_instance_t));
+
+  size_t pathlen = PATH_MAX;
   char path[PATH_MAX];
-  napi_threadsafe_function callback = NULL;
+  int64_t since;
+
+  CHECK(napi_get_value_external(env, argv[0], (void **)&instance->fseenv) == napi_ok);
+  CHECK(napi_get_value_string_utf8(env, argv[1], path, pathlen, &pathlen) == napi_ok);
+  CHECK(napi_get_value_int64(env, argv[2], &since) == napi_ok);
+  instance->stream = NULL;
+  strncpy(instance->path, path, PATH_MAX);
   napi_value asyncResource, asyncName;
 
-  CHECK(napi_get_cb_info(env, info, &argc, argv,  NULL, NULL) == napi_ok);
-  CHECK(napi_get_value_string_utf8(env, argv[0], path, PATH_MAX, &argc) == napi_ok);
   CHECK(napi_create_object(env, &asyncResource) == napi_ok);
   CHECK(napi_create_string_utf8(env, "fsevents", NAPI_AUTO_LENGTH, &asyncName) == napi_ok);
-  CHECK(napi_create_threadsafe_function(env, argv[1], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_events, &callback) == napi_ok);
-  CHECK(napi_ref_threadsafe_function(env, callback) == napi_ok);
+  CHECK(napi_create_threadsafe_function(env, argv[3], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_event, &instance->callback) == napi_ok);
+  CHECK(napi_ref_threadsafe_function(env, instance->callback) == napi_ok);
 
+  CFRunLoopPerformBlock(instance->fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
+    FSEventStreamContext streamcontext = {0, instance, NULL, NULL, NULL};
+    CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
+    instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
+    FSEventStreamScheduleWithRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+    FSEventStreamStart(instance->stream);
+  });
+  CFRunLoopWakeUp(instance->fseenv->loop);
   napi_value result;
-  if (!callback) {
-    CHECK(napi_get_undefined(env, &result) == napi_ok);
-    return result;
-  }
-  fse_watcher_t watcher = fse_alloc();
-  CHECK(watcher);
-  fse_watch(path, fse_propagate_event, callback, fse_watcher_started, fse_watcher_ended, watcher);
-
-  CHECK(napi_create_external(env, watcher, fse_free_watcher, callback, &result) == napi_ok);
+  CHECK(napi_create_external(env, instance, fse_instance_destroy, NULL, &result) == napi_ok);
   return result;
 }
-static napi_value FSEStop(napi_env env, napi_callback_info info) {
+
+napi_value FSEStop(napi_env env, napi_callback_info info)
+{
   size_t argc = 1;
-  napi_value external;
-  fse_watcher_t watcher;
-  CHECK(napi_get_cb_info(env, info, &argc, &external,  NULL, NULL) == napi_ok);
-  CHECK(napi_get_value_external(env, external, (void**)&watcher) == napi_ok);
-  napi_threadsafe_function callback = (napi_threadsafe_function)fse_context_of(watcher);
-  if (callback) {
-    CHECK(napi_unref_threadsafe_function(env, callback) == napi_ok);
+  napi_value argv[argc];
+  CHECK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL) == napi_ok);
+  fse_instance_t *instance = NULL;
+  CHECK(napi_get_value_external(env, argv[0], (void **)&instance) == napi_ok);
+
+  if (instance->stream)
+  {
+    pthread_mutex_lock(&instance->fseenv->lock);
+    CFRunLoopPerformBlock(instance->fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
+      FSEventStreamStop(instance->stream);
+      FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+      FSEventStreamInvalidate(instance->stream);
+      FSEventStreamRelease(instance->stream);
+      pthread_mutex_unlock(&instance->fseenv->lock);
+    });
   }
-  fse_unwatch(watcher);
-  napi_value result;
-  CHECK(napi_get_undefined(env, &result) == napi_ok);
-  return result;
+  CFRunLoopWakeUp(instance->fseenv->loop);
+  pthread_mutex_lock(&instance->fseenv->lock);
+  instance->stream = NULL;
+  pthread_mutex_unlock(&instance->fseenv->lock);
+
+  if (instance->callback)
+  {
+    CHECK(napi_unref_threadsafe_function(env, instance->callback) == napi_ok);
+    CHECK(napi_release_threadsafe_function(instance->callback, napi_tsfn_abort) == napi_ok);
+    instance->callback = NULL;
+  }
+
+  CHECK(napi_get_undefined(env, &argv[0]) == napi_ok);
+  return argv[0];
 }
 
-#define CONSTANT(name) do {\
-  CHECK(napi_create_int32(env, kFSEventStreamEventFlag##name, &value) == napi_ok);\
-  CHECK(napi_set_named_property(env, constants, #name, value) == napi_ok);\
-} while (0)
-
-napi_value Init(napi_env env, napi_value exports) {
-  fse_init();
-  napi_value value, constants;
-
+napi_value Init_Constants(napi_env env)
+{
+  napi_value constants, value;
   CHECK(napi_create_object(env, &constants) == napi_ok);
-  napi_property_descriptor descriptors[] = {
-    { "start",     NULL,  FSEStart, NULL, NULL,  NULL, napi_default, NULL },
-    { "stop",      NULL,  FSEStop,  NULL, NULL,  NULL, napi_default, NULL },
-    { "constants", NULL,  NULL,     NULL, NULL,  constants, napi_default, NULL }
-  };
-  CHECK(napi_define_properties(env, exports, 3, descriptors) == napi_ok);
-
   CONSTANT(None);
   CONSTANT(MustScanSubDirs);
   CONSTANT(UserDropped);
@@ -151,7 +283,30 @@ napi_value Init(napi_env env, napi_value exports) {
   CONSTANT(ItemIsLastHardlink);
   CONSTANT(OwnEvent);
   CONSTANT(ItemCloned);
+  return constants;
+}
+napi_value Init_Flags(napi_env env)
+{
+  napi_value flags, value;
+  CHECK(napi_create_object(env, &flags) == napi_ok);
+  CHECK(napi_create_int64(env, kFSEventStreamEventIdSinceNow, &value) == napi_ok);
+  CHECK(napi_set_named_property(env, flags, "SinceNow", value) == napi_ok);
+  return flags;
+}
+napi_value Init(napi_env env, napi_value exports)
+{
+  napi_value global = fse_environment_create(env);
+  napi_value constants = Init_Constants(env);
+  napi_value flags = Init_Flags(env);
 
+  napi_property_descriptor descriptors[] = {
+      {"global", NULL, NULL, NULL, NULL, global, napi_default, NULL},
+      {"start", NULL, FSEStart, NULL, NULL, NULL, napi_default, NULL},
+      {"stop", NULL, FSEStop, NULL, NULL, NULL, napi_default, NULL},
+      {"constants", NULL, NULL, NULL, NULL, constants, napi_default, NULL},
+      {"flags", NULL, NULL, NULL, NULL, flags, napi_default, NULL}};
+
+  CHECK(napi_define_properties(env, exports, 5, descriptors) == napi_ok);
   return exports;
 }
 

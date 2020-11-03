@@ -3,7 +3,7 @@
     ['OS=="mac"', {
       "targets": [{
         "target_name": "fsevents",
-        "sources": [ "src/fsevents.c", "src/rawfsevents.c" ],
+        "sources": [ "src/fsevents.c"],
         "xcode_settings": {
           "OTHER_LDFLAGS": [
             "-Wl,-bind_at_load",
