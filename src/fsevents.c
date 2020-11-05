@@ -50,6 +50,7 @@ void fse_environment_destroy(napi_env env, void *voidenv, void *hint)
 {
   fse_environment_t *fseenv = voidenv;
   CFRunLoopRemoveSource(fseenv->loop, fseenv->source, kCFRunLoopDefaultMode);
+  CFRunLoopStop(fseenv->loop);
   pthread_join(fseenv->thread, NULL);
   fseenv->thread = NULL;
   pthread_mutex_destroy(&fseenv->lock);
