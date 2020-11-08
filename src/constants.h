@@ -4,7 +4,7 @@
 #include "CoreFoundation/CoreFoundation.h"
 #include "CoreServices/CoreServices.h"
 
-// constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamEventFlags
+// constants from https://developer.apple.com/documentation/coreservices/1455361-fseventstreameventflags?language=objc
 #ifndef kFSEventStreamEventFlagNone
 #define kFSEventStreamEventFlagNone 0x00000000
 #endif
@@ -101,7 +101,7 @@
 #define kFSEventStreamEventFlagItemCloned 0x00400000
 #endif
 
-// constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamCreateFlags
+// constants from https://developer.apple.com/documentation/coreservices/1455376-fseventstreamcreateflags?language=objc
 #ifndef kFSEventStreamCreateFlagNone
 #define kFSEventStreamCreateFlagNone 0x00000000
 #endif
