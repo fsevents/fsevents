@@ -2,7 +2,7 @@ name: Node CI
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: macOS-11.0
+    runs-on: macos-11.0
     strategy:
       matrix:
         node-version: [8, 10, 12, 14, 15]
@@ -24,15 +24,15 @@ jobs:
         file fsevents.node | grep -q arm64 || echo "arm64 binary not built"
         file fsevents.node | grep -q x86_64 || echo "x86_64 binary not built"
     - name: Upload binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: binary
-          path: fsevents.node
+      uses: actions/upload-artifact@v2
+      with:
+        name: binary
+        path: fsevents.node
       env:
         CI: true
   test_macos_10:
     name: 'Test universal binary on macOS 10.15'
-    runs-on: macOS-10.15
+    runs-on: macos-10.15
     needs: build
     strategy:
       matrix:
@@ -48,9 +48,9 @@ jobs:
       run: |
         npm install
     - name: Download universal binary
-        uses: actions/download-artifact@v2
-        with:
-          name: binary
+      uses: actions/download-artifact@v2
+      with:
+        name: binary
     - name: ensure universal binary (arm64/x86_64)
       run: |
         file fsevents.node
