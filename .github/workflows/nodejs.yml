@@ -8,7 +8,7 @@ jobs:
         node-version: [8, 10, 12, 14, 15]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Node v${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
@@ -39,7 +39,7 @@ jobs:
         node-version: [8, 10, 12, 14, 15]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Node v${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
