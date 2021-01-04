@@ -7,9 +7,6 @@ on:
 jobs:
   publish:
     runs-on: macos-11.0
-    strategy:
-      matrix:
-        node-version: 12
     steps:
     - uses: actions/checkout@v2
     - name: node v12
