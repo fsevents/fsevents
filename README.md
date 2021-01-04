@@ -66,6 +66,7 @@ The `FsEventsInfo` has the following shape:
 
 ## Engine compatibility
 
+- v2.3 supports Apple Silicon ARM CPUs
 - v2 supports node 8.16+
 - v1.2.8 supports node 6+
 - v1.2.7 supports node 4+
