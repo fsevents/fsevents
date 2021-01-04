@@ -1,0 +1,35 @@
+name: NPM Publish
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  publish:
+    runs-on: macos-11.0
+    strategy:
+      matrix:
+        node-version: 12
+    steps:
+    - uses: actions/checkout@v2
+    - name: node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build --if-present
+        npm test
+    - name: ensure universal binary (arm64/x86_64)
+      run: |
+        file fsevents.node
+        file fsevents.node | grep -q arm64 || (echo "arm64 binary not built"; exit 1)
+        file fsevents.node | grep -q x86_64 || (echo "x86_64 binary not built"; exit 1)
+    - name: npm publish
+      uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.NPM_TOKEN }}
+      env:
+        CI: true
+ 
