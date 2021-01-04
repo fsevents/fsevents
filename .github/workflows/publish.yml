@@ -1,14 +1,14 @@
-name: NPM Publish
+name: npm publish
 on:
   push:
     branches:
     - master
-
 jobs:
   publish:
     runs-on: macos-11.0
     steps:
-    - uses: actions/checkout@v2
+    - name: checkout
+      uses: actions/checkout@v2
     - name: node v12
       uses: actions/setup-node@v1
       with:
@@ -30,4 +30,3 @@ jobs:
         dry-run: true 
       env:
         CI: true
- 
