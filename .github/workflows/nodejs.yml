@@ -1,5 +1,12 @@
 name: Node CI
-on: [push, pull_request]
+on: 
+  push:
+    branches:
+    - '*'
+    - '!master'
+  pull_request:
+    braches:
+    - 'master'
 jobs:
   build:
     runs-on: macos-11.0
