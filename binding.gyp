@@ -5,9 +5,15 @@
         "target_name": "fsevents",
         "sources": [ "src/fsevents.c"],
         "xcode_settings": {
+          "OTHER_CFLAGS": [
+            "-arch x86_64",
+            "-arch arm64"
+          ],
           "OTHER_LDFLAGS": [
             "-Wl,-bind_at_load",
-            "-framework CoreFoundation -framework CoreServices"
+            "-framework CoreFoundation -framework CoreServices",
+            "-arch x86_64",
+            "-arch arm64"
           ]
         }
       }, {
