@@ -18,6 +18,8 @@ jobs:
         npm install
         npm run build --if-present
         npm test
+      env:
+        CI: true
     - name: ensure universal binary (arm64/x86_64)
       run: |
         file fsevents.node
@@ -28,5 +30,13 @@ jobs:
       with:
         token: ${{ secrets.NPM_TOKEN }}
         dry-run: true 
+    - name: github release
+      uses: actions/create-release@v1
       env:
-        CI: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.publish.outputs.version }}
+        release_name: Release ${{ steps.publish.outputs.version }}
+        body: Released to npm as v${{ steps.publish.outputs.version }}
+        draft: false
+        prerelease: false
