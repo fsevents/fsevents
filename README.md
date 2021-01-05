@@ -52,7 +52,7 @@ The `FsEventsInfo` has the following shape:
  */
 {
   "event": "created", // {FsEventsEvent}
-  "path": "file.txt", 
+  "path": "file.txt",
   "type": "file",    // {FsEventsType}
   "changes": {
     "inode": true,   // Had iNode Meta-Information changed
@@ -64,10 +64,10 @@ The `FsEventsInfo` has the following shape:
 }
 ```
 
-## Engine compatibility
+## Changelog
 
 - v2.3 supports Apple Silicon ARM CPUs
-- v2 supports node 8.16+
+- v2 supports node 8.16+ and reduces package size massively
 - v1.2.8 supports node 6+
 - v1.2.7 supports node 4+
 
