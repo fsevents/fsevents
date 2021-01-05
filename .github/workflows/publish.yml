@@ -30,15 +30,14 @@ jobs:
       uses: JS-DevTools/npm-publish@v1
       with:
         token: ${{ secrets.NPM_TOKEN }}
-        dry-run: true 
     - if: steps.publish.outputs.type != 'none'
       name: github release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.publish.outputs.version }}
-        release_name: Release ${{ steps.publish.outputs.version }}
+        tag_name: v${{ steps.publish.outputs.version }}
+        release_name: Release v${{ steps.publish.outputs.version }}
         body: Released to npm as v${{ steps.publish.outputs.version }}
         draft: false
         prerelease: false
