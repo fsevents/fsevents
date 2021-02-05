@@ -9,7 +9,7 @@ on:
     - 'master'
 jobs:
   build:
-    runs-on: macos-11.0
+    runs-on: self-hosted
     strategy:
       matrix:
         node-version: [8, 10, 12, 14, 15]
