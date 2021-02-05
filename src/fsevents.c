@@ -44,26 +44,25 @@ typedef struct
   pthread_t thread;
   pthread_mutex_t lock;
   CFRunLoopRef loop;
-  CFRunLoopSourceRef source;
 } fse_environment_t;
 void fse_environment_destroy(napi_env env, void *voidenv, void *hint)
 {
   fse_environment_t *fseenv = voidenv;
-  CFRunLoopRemoveSource(fseenv->loop, fseenv->source, kCFRunLoopDefaultMode);
   CFRunLoopStop(fseenv->loop);
   pthread_join(fseenv->thread, NULL);
-  fseenv->thread = NULL;
   pthread_mutex_destroy(&fseenv->lock);
+  fseenv->thread = NULL;
+  fseenv->loop = NULL;
   free(fseenv);
 }
 void *fse_run_loop(void *voidenv)
 {
   fse_environment_t *fseenv = voidenv;
   fseenv->loop = CFRunLoopGetCurrent();
-  CFRunLoopAddSource(fseenv->loop, fseenv->source, kCFRunLoopDefaultMode);
-  CFRunLoopPerformBlock(fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
-    pthread_mutex_unlock(&fseenv->lock);
-  });
+  CFRunLoopSourceContext context = {0, NULL, NULL, NULL, NULL, NULL, NULL, &RunLoopSourceScheduleRoutine, RunLoopSourceCancelRoutine, RunLoopSourcePerformRoutine};
+  CFRunLoopSourceRef source = CFRunLoopSourceCreate(NULL, 0, &context);
+  CFRunLoopAddSource(fseenv->loop, source, kCFRunLoopDefaultMode);
+  pthread_mutex_unlock(&fseenv->lock);
   CFRunLoopRun();
   pthread_mutex_lock(&fseenv->lock);
   fseenv->loop = NULL;
@@ -74,9 +73,6 @@ napi_value fse_environment_create(napi_env env)
 {
   fse_environment_t *fseenv = malloc(sizeof(fse_environment_t));
   fseenv->loop = NULL;
-
-  CFRunLoopSourceContext context = {0, NULL, NULL, NULL, NULL, NULL, NULL, &RunLoopSourceScheduleRoutine, RunLoopSourceCancelRoutine, RunLoopSourcePerformRoutine};
-  fseenv->source = CFRunLoopSourceCreate(NULL, 0, &context);
 
   pthread_mutex_init(&fseenv->lock, NULL);
   pthread_mutex_lock(&fseenv->lock);
@@ -113,20 +109,15 @@ typedef struct
 void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
 {
   fse_instance_t *instance = voidinst;
+
   if (instance->stream)
   {
-    pthread_mutex_lock(&instance->fseenv->lock);
-    CFRunLoopPerformBlock(instance->fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
-      FSEventStreamStop(instance->stream);
-      FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
-      FSEventStreamInvalidate(instance->stream);
-      FSEventStreamRelease(instance->stream);
-      pthread_mutex_unlock(&instance->fseenv->lock);
-    });
+    FSEventStreamStop(instance->stream);
+    FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+    FSEventStreamInvalidate(instance->stream);
+    FSEventStreamRelease(instance->stream);
+    instance->stream = NULL;
   }
-  pthread_mutex_lock(&instance->fseenv->lock);
-  pthread_mutex_unlock(&instance->fseenv->lock);
-  instance->stream = NULL;
 
   if (instance->callback)
   {
@@ -135,10 +126,18 @@ void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
     instance->callback = NULL;
   }
 
-  free(instance);
+  if (instance != hint)
+  {
+    free(instance);
+  }
 }
 void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *data)
 {
+  if (!env)
+  {
+    return;
+  }
+
   fse_events_t *events = data;
   int argc = 3, idx = 0;
   napi_value args[argc];
@@ -208,14 +207,12 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
   CHECK(napi_create_threadsafe_function(env, argv[3], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_event, &instance->callback) == napi_ok);
   CHECK(napi_ref_threadsafe_function(env, instance->callback) == napi_ok);
 
-  CFRunLoopPerformBlock(instance->fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
-    FSEventStreamContext streamcontext = {0, instance, NULL, NULL, NULL};
-    CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
-    instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
-    FSEventStreamScheduleWithRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
-    FSEventStreamStart(instance->stream);
-  });
-  CFRunLoopWakeUp(instance->fseenv->loop);
+  FSEventStreamContext streamcontext = {0, instance, NULL, NULL, NULL};
+  CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
+  instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
+  FSEventStreamScheduleWithRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+  FSEventStreamStart(instance->stream);
+
   napi_value result;
   CHECK(napi_create_external(env, instance, fse_instance_destroy, NULL, &result) == napi_ok);
   return result;
@@ -229,28 +226,7 @@ napi_value FSEStop(napi_env env, napi_callback_info info)
   fse_instance_t *instance = NULL;
   CHECK(napi_get_value_external(env, argv[0], (void **)&instance) == napi_ok);
 
-  if (instance->stream)
-  {
-    pthread_mutex_lock(&instance->fseenv->lock);
-    CFRunLoopPerformBlock(instance->fseenv->loop, kCFRunLoopDefaultMode, ^(void) {
-      FSEventStreamStop(instance->stream);
-      FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
-      FSEventStreamInvalidate(instance->stream);
-      FSEventStreamRelease(instance->stream);
-      pthread_mutex_unlock(&instance->fseenv->lock);
-    });
-  }
-  CFRunLoopWakeUp(instance->fseenv->loop);
-  pthread_mutex_lock(&instance->fseenv->lock);
-  instance->stream = NULL;
-  pthread_mutex_unlock(&instance->fseenv->lock);
-
-  if (instance->callback)
-  {
-    CHECK(napi_unref_threadsafe_function(env, instance->callback) == napi_ok);
-    CHECK(napi_release_threadsafe_function(instance->callback, napi_tsfn_abort) == napi_ok);
-    instance->callback = NULL;
-  }
+  fse_instance_destroy(env, instance, instance);
 
   CHECK(napi_get_undefined(env, &argv[0]) == napi_ok);
   return argv[0];
