@@ -11,7 +11,7 @@
     "darwin"
   ],
   "engines": {
-    "node": ">= 4.0"
+    "node": ">=4.0 <=12"
   },
   "scripts": {
     "test": "node ./test/fsevents.js && node ./test/function.js 2> /dev/null",
