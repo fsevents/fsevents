@@ -35,6 +35,12 @@
 //#include <stdio.h>
 //#define DEBUG(str, idx) printf("%s(%i)\n", str, idx);
 
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_13_AND_LATER
+  bool fse_extended_data_supported = true;
+#else
+  bool fse_extended_data_supported = false;
+#endif
+
 void RunLoopSourceScheduleRoutine(void *info, CFRunLoopRef loop, CFStringRef mode) {}
 void RunLoopSourcePerformRoutine(void *info) {}
 void RunLoopSourceCancelRoutine(void *info, CFRunLoopRef loop, CFStringRef mode) {}
@@ -100,6 +106,7 @@ typedef struct
   unsigned long long id;
   char path[PATH_MAX];
   unsigned int flags;
+  uint64_t inode;
 } fse_event_t;
 typedef struct
 {
@@ -140,15 +147,23 @@ void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *
 
   fse_events_t *events = data;
   int argc = 3, idx = 0;
+  if (fse_extended_data_supported)
+  {
+    argc = 4;
+  }
   napi_value args[argc];
   for (idx = 0; idx < events->length; idx++)
   {
     CHECK(napi_create_string_utf8(env, events->events[idx].path, NAPI_AUTO_LENGTH, &args[0]) == napi_ok);
     CHECK(napi_create_uint32(env, events->events[idx].flags, &args[1]) == napi_ok);
     CHECK(napi_create_int64(env, events->events[idx].id, &args[2]) == napi_ok);
+    if (fse_extended_data_supported)
+    {
+      CHECK(napi_create_int64(env, events->events[idx].inode, &args[3]) == napi_ok);
+    }
     napi_value recv;
     CHECK(napi_get_null(env, &recv) == napi_ok);
-    CHECK(napi_call_function(env, recv, callback, 3, args, &recv) == napi_ok);
+    CHECK(napi_call_function(env, recv, callback, argc, args, &recv) == napi_ok);
   }
   free(events->events);
   free(events);
@@ -173,13 +188,29 @@ void fse_handle_events(
   size_t idx;
   for (idx = 0; idx < numEvents; idx++)
   {
-    CFStringRef path = (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
+    CFDictionaryRef path_info_dict;
+    CFStringRef path;
+    CFNumberRef cf_inode;
+    if (fse_extended_data_supported)
+    {
+      path_info_dict = CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
+      path = CFDictionaryGetValue(path_info_dict, kFSEventStreamEventExtendedDataPathKey);
+      cf_inode = CFDictionaryGetValue(path_info_dict, kFSEventStreamEventExtendedFileIDKey);
+    }
+    else
+    {
+      path = (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
+    }
     if (!CFStringGetCString(path, events->events[idx].path, PATH_MAX, kCFStringEncodingUTF8))
     {
       events->events[idx].path[0] = 0;
     }
     events->events[idx].id = eventIds[idx];
     events->events[idx].flags = eventFlags[idx];
+    if (fse_extended_data_supported)
+    {
+      CFNumberGetValue(cf_inode, kCFNumberSInt64Type, &(events->events[idx].inode));
+    }
   }
   CHECK(napi_call_threadsafe_function(instance->callback, events, napi_tsfn_blocking) == napi_ok);
 }
@@ -209,7 +240,12 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
 
   FSEventStreamContext streamcontext = {0, instance, NULL, NULL, NULL};
   CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
-  instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
+  uint32_t event_stream_create_flags = kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes;
+  if (fse_extended_data_supported)
+  {
+    event_stream_create_flags |= kFSEventStreamCreateFlagUseExtendedData;
+  }
+  instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, event_stream_create_flags);
   FSEventStreamScheduleWithRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
   FSEventStreamStart(instance->stream);
 

@@ -13,7 +13,7 @@ declare type Info = {
   changes: FileChanges;
   flags: number;
 };
-declare type WatchHandler = (path: string, flags: number, id: string) => void;
+declare type WatchHandler = (path: string, flags: number, id: string, inode?: number) => void;
 export declare function watch(path: string, handler: WatchHandler): () => Promise<void>;
 export declare function watch(path: string, since: number, handler: WatchHandler): () => Promise<void>;
 export declare function getInfo(path: string, flags: number): Info;

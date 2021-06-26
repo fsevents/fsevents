@@ -1,6 +1,7 @@
 #ifndef __constants_h
 #define __constants_h
 
+#include "Availability.h"
 #include "CoreFoundation/CoreFoundation.h"
 #include "CoreServices/CoreServices.h"
 
@@ -124,6 +125,10 @@
 
 #ifndef kFSEventStreamCreateFlagFileEvents
 #define kFSEventStreamCreateFlagFileEvents 0x00000010
+#endif
+
+#ifndef kFSEventStreamCreateFlagUseExtendedData
+#define kFSEventStreamCreateFlagUseExtendedData 0x00000040
 #endif
 
 #endif
