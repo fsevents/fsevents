@@ -22,25 +22,25 @@ npm install fsevents
 ```js
 const fsevents = require('fsevents');
 const stop = fsevents.watch(__dirname, (path, flags, id) => {
-  const info = fsevents.getInfo(path, flags, id);
+  const info = fsevents.getInfo(path, flags);
 }); // To start observation
 stop(); // To end observation
 ```
 
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
-a change in the file system. It takes three arguments:
+change in the file system. It takes three arguments:
 
 ###### `fsevents.watch(dirname: string, (path: string, flags: number, id: string) => void): () => Promise<undefined>`
 
- * `path: string` - the item in the filesystem that have been changed
+ * `path: string` - the item in the filesystem that has been changed
  * `flags: number` - a numeric value describing what the change was
  * `id: string` - an unique-id identifying this specific event
 
  Returns closer callback which when called returns a Promise resolving when the watcher process has been shut down.
 
-###### `fsevents.getInfo(path: string, flags: number, id: string): FsEventInfo`
+###### `fsevents.getInfo(path: string, flags: number): FsEventInfo`
 
-The `getInfo` function takes the `path`, `flags` and `id` arguments and converts those parameters into a structure
+The `getInfo` function takes the `path` and `flags` arguments and converts those parameters into a structure
 that is easier to digest to determine what the change was.
 
 The `FsEventsInfo` has the following shape:
