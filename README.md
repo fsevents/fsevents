@@ -21,11 +21,19 @@ npm install fsevents
 
 ```js
 const fsevents = require('fsevents');
+
+// To start observation
 const stop = fsevents.watch(__dirname, (path, flags, id) => {
   const info = fsevents.getInfo(path, flags, id);
-}); // To start observation
-stop(); // To end observation
+});
+
+// To end observation
+stop();
 ```
+
+> **Important note:** The API behaviour is slightly different from typical JS APIs. The `stop` function **must** be
+> retrieved and stored somewhere, even if you don't plan to stop the watcher. If you forget it, the garbage collector
+> will eventually kick in, the watcher will be unregistered, and your callbacks won't be called anymore.
 
 The callback passed as the second parameter to `.watch` get's called whenever the operating system detects a
 a change in the file system. It takes three arguments:
