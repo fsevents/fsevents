@@ -24,7 +24,7 @@ const fsevents = require('fsevents');
 
 // To start observation
 const stop = fsevents.watch(__dirname, (path, flags, id) => {
-  const info = fsevents.getInfo(path, flags, id);
+  const info = fsevents.getInfo(path, flags);
 });
 
 // To end observation
