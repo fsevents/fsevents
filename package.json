@@ -5,7 +5,8 @@
   "main": "fsevents.js",
   "types": "fsevents.d.ts",
   "os": [
-    "darwin"
+    "darwin",
+    "linux"
   ],
   "files": [
     "fsevents.d.ts",
