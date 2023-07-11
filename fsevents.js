@@ -10,7 +10,7 @@ if (process.platform !== "darwin") {
   throw new Error(`Module 'fsevents' is not compatible with platform '${process.platform}'`);
 }
 
-const Native = require("./fsevents.node");
+const Native = window.require("./fsevents.node");
 const events = Native.constants;
 
 function watch(path, since, handler) {
