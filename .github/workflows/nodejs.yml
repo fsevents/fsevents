@@ -9,7 +9,7 @@ on:
     - 'master'
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: macos-latest
     strategy:
       matrix:
         node-version: [18,20]
@@ -37,9 +37,9 @@ jobs:
         path: fsevents.node
       env:
         CI: true
-  test_macos_10:
+  test_macos:
     name: 'Test universal binary on macOS 10.15'
-    runs-on: macos-10.15
+    runs-on: macos-latest
     needs: build
     strategy:
       matrix:
