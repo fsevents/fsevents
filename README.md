@@ -1,4 +1,4 @@
-# fsevents [![NPM](https://nodei.co/npm/fsevents.png)](https://nodei.co/npm/fsevents/)
+# fsevents
 
 Native access to MacOS FSEvents in [Node.js](https://nodejs.org/)
 
@@ -9,15 +9,13 @@ to kqueue.
 This is a low-level library. For a cross-platform file watching module that
 uses fsevents, check out [Chokidar](https://github.com/paulmillr/chokidar).
 
-## Installation
-
-Supports only **Node.js v8.16 and higher**.
+## Usage
 
 ```sh
 npm install fsevents
 ```
 
-## Usage
+Supports only **Node.js v8.16 and higher**.
 
 ```js
 const fsevents = require('fsevents');
