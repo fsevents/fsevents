@@ -9,10 +9,10 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
-    - name: node v12
+    - name: node v18
       uses: actions/setup-node@v1
       with:
-        node-version: 12
+        node-version: 18
     - name: npm install, build, and test
       run: |
         npm install
