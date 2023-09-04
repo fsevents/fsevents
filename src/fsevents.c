@@ -20,6 +20,9 @@
 #endif
 #endif
 
+#include "CoreFoundation/CFRunLoop.h"
+#include "FSEvents/FSEvents.h"
+
 #include "constants.h"
 #define CONSTANT(name)                                                               \
   do                                                                                 \

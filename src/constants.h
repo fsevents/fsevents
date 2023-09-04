@@ -1,9 +1,6 @@
 #ifndef __constants_h
 #define __constants_h
 
-#include "CoreFoundation/CoreFoundation.h"
-#include "CoreServices/CoreServices.h"
-
 // constants from https://developer.apple.com/documentation/coreservices/1455361-fseventstreameventflags?language=objc
 #ifndef kFSEventStreamEventFlagNone
 #define kFSEventStreamEventFlagNone 0x00000000
