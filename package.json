@@ -8,7 +8,6 @@
     "darwin"
   ],
   "files": [
-    "binding.gyp",
     "fsevents.d.ts",
     "fsevents.js",
     "fsevents.node"
@@ -19,9 +18,10 @@
   "gypfile": true,
   "scripts": {
     "clean": "node-gyp clean && rm -f fsevents.node",
-    "build": "node-gyp clean && rm -f fsevents.node && node-gyp rebuild && node-gyp clean",
+    "rebuild": "node-gyp clean && rm -f fsevents.node && node-gyp rebuild && node-gyp clean",
     "test": "/bin/bash ./test.sh 2>/dev/null",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run rebuild",
+    "prepare": "npm run rebuild"
   },
   "repository": {
     "type": "git",
