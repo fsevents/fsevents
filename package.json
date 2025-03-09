@@ -15,12 +15,12 @@
   "engines": {
     "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
   },
-  "gypfile": true,
+  "gypfile": false,
   "scripts": {
     "clean": "node-gyp clean && rm -f fsevents.node",
-    "rebuild": "node-gyp clean && rm -f fsevents.node && node-gyp rebuild && node-gyp clean",
+    "build": "node-gyp clean && rm -f fsevents.node && node-gyp rebuild && node-gyp clean",
     "test": "/bin/bash ./test.sh 2>/dev/null",
-    "prepublishOnly": "npm run rebuild"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
