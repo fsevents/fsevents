@@ -31,57 +31,40 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <dispatch/dispatch.h>
 
 //#include <stdio.h>
 //#define DEBUG(str, idx) printf("%s(%i)\n", str, idx);
 
-void RunLoopSourceScheduleRoutine(void *info, CFRunLoopRef loop, CFStringRef mode) {}
-void RunLoopSourcePerformRoutine(void *info) {}
-void RunLoopSourceCancelRoutine(void *info, CFRunLoopRef loop, CFStringRef mode) {}
-
 typedef struct
 {
-  pthread_t thread;
+  dispatch_queue_t queue;
   pthread_mutex_t lock;
-  CFRunLoopRef loop;
 } fse_environment_t;
+
 void fse_environment_destroy(napi_env env, void *voidenv, void *hint)
 {
   fse_environment_t *fseenv = voidenv;
-  CFRunLoopStop(fseenv->loop);
-  pthread_join(fseenv->thread, NULL);
+  if (fseenv->queue)
+  {
+    dispatch_release(fseenv->queue);
+    fseenv->queue = NULL;
+  }
   pthread_mutex_destroy(&fseenv->lock);
-  fseenv->thread = NULL;
-  fseenv->loop = NULL;
   free(fseenv);
 }
-void *fse_run_loop(void *voidenv)
-{
-  fse_environment_t *fseenv = voidenv;
-  fseenv->loop = CFRunLoopGetCurrent();
-  CFRunLoopSourceContext context = {0, NULL, NULL, NULL, NULL, NULL, NULL, &RunLoopSourceScheduleRoutine, RunLoopSourceCancelRoutine, RunLoopSourcePerformRoutine};
-  CFRunLoopSourceRef source = CFRunLoopSourceCreate(NULL, 0, &context);
-  CFRunLoopAddSource(fseenv->loop, source, kCFRunLoopDefaultMode);
-  pthread_mutex_unlock(&fseenv->lock);
-  CFRunLoopRun();
-  pthread_mutex_lock(&fseenv->lock);
-  fseenv->loop = NULL;
-  pthread_mutex_unlock(&fseenv->lock);
-  return NULL;
-}
+
 napi_value fse_environment_create(napi_env env)
 {
   fse_environment_t *fseenv = malloc(sizeof(fse_environment_t));
-  fseenv->loop = NULL;
-
+  fseenv->queue = dispatch_queue_create("fsevents", DISPATCH_QUEUE_CONCURRENT);
+  if (!fseenv->queue)
+  {
+    free(fseenv);
+    return NULL;
+  }
+  
   pthread_mutex_init(&fseenv->lock, NULL);
-  pthread_mutex_lock(&fseenv->lock);
-
-  fseenv->thread = NULL;
-  pthread_create(&fseenv->thread, NULL, fse_run_loop, (void *)fseenv);
-
-  pthread_mutex_lock(&fseenv->lock);
-  pthread_mutex_unlock(&fseenv->lock);
 
   napi_value result;
   CHECK(napi_create_external(env, fseenv, fse_environment_destroy, NULL, &result) == napi_ok);
@@ -113,7 +96,6 @@ void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
   if (instance->stream)
   {
     FSEventStreamStop(instance->stream);
-    FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
     FSEventStreamInvalidate(instance->stream);
     FSEventStreamRelease(instance->stream);
     instance->stream = NULL;
@@ -210,7 +192,9 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
   FSEventStreamContext streamcontext = {0, instance, NULL, NULL, NULL};
   CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
   instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
-  FSEventStreamScheduleWithRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+  
+  // Use the new dispatch queue API instead of the deprecated RunLoop API
+  FSEventStreamSetDispatchQueue(instance->stream, instance->fseenv->queue);
   FSEventStreamStart(instance->stream);
 
   napi_value result;

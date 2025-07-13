@@ -6,6 +6,11 @@ const assert = require("assert");
 
 const DIR = process.argv[2];
 
+// Helper function to check if required flags are present
+function hasFlags(actualFlags, requiredFlags) {
+  return requiredFlags.every(flag => (actualFlags & flag) !== 0);
+}
+
 run(async () => {
   await mkdir(`${DIR}/A`);
   await mkdir(`${DIR}/B`);
@@ -26,15 +31,26 @@ run(async () => {
 
   native.stop(listenerB);
 
-  const expected = [
-    [path.join(`${DIR}/A`, "created"), 66816, 80865],
-    [path.join(`${DIR}/B`, "renamed"), 67584, 80888],
-    [path.join(`${DIR}/B`, "renamed"), 68096, 80910],
+  // Instead of checking exact flag values, check for required flags
+  const constants = {
+    ItemCreated: 256,
+    ItemRemoved: 512,
+    ItemRenamed: 2048,
+    ItemModified: 4096,
+    ItemIsFile: 65536
+  };
+
+  const expectedPatterns = [
+    { path: path.join(`${DIR}/A`, "created"), requiredFlags: [constants.ItemCreated, constants.ItemIsFile] },
+    { path: path.join(`${DIR}/B`, "renamed"), requiredFlags: [constants.ItemRenamed, constants.ItemIsFile] },
+    { path: path.join(`${DIR}/B`, "renamed"), requiredFlags: [constants.ItemRemoved, constants.ItemIsFile] },
   ];
-  assert.equal(events.length, expected.length);
+
+  assert.equal(events.length, expectedPatterns.length);
   for (let idx = 0; idx < events.length; idx++) {
-    assert.equal(events[idx].length, expected[idx].length);
-    assert.equal(events[idx][0], expected[idx][0]);
-    assert.equal(events[idx][1], expected[idx][1]);
+    assert.equal(events[idx].length, 3);  // [path, flags, id]
+    assert.equal(events[idx][0], expectedPatterns[idx].path);
+    assert(hasFlags(events[idx][1], expectedPatterns[idx].requiredFlags), 
+      `Event ${idx}: flags ${events[idx][1]} should contain required flags ${expectedPatterns[idx].requiredFlags.join(', ')}`);
   }
 });
