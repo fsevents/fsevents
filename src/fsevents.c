@@ -36,35 +36,103 @@
 //#include <stdio.h>
 //#define DEBUG(str, idx) printf("%s(%i)\n", str, idx);
 
+// Check if we should use the modern dispatch queue API
+// FSEventStreamSetDispatchQueue is available since macOS 10.6, but we prefer
+// to use it when compiling against macOS 10.10+ SDK for better stability
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101000  // macOS 10.10+
+#define USE_DISPATCH_QUEUE 1
+#else
+#define USE_DISPATCH_QUEUE 0
+#endif
+
 typedef struct
 {
+#if USE_DISPATCH_QUEUE
   dispatch_queue_t queue;
+#else
+  CFRunLoopRef loop;
+  pthread_t thread;
   pthread_mutex_t lock;
+#endif
 } fse_environment_t;
 
 void fse_environment_destroy(napi_env env, void *voidenv, void *hint)
 {
   fse_environment_t *fseenv = voidenv;
+  
+#if USE_DISPATCH_QUEUE
   if (fseenv->queue)
   {
     dispatch_release(fseenv->queue);
     fseenv->queue = NULL;
   }
+#else
+  if (fseenv->loop)
+  {
+    CFRunLoopStop(fseenv->loop);
+    if (fseenv->thread)
+    {
+      pthread_join(fseenv->thread, NULL);
+    }
+    CFRelease(fseenv->loop);
+    fseenv->loop = NULL;
+  }
   pthread_mutex_destroy(&fseenv->lock);
+#endif
+  
   free(fseenv);
 }
+
+#if !USE_DISPATCH_QUEUE
+void *fse_thread_start(void *arg)
+{
+  fse_environment_t *fseenv = arg;
+  
+  pthread_mutex_lock(&fseenv->lock);
+  fseenv->loop = CFRunLoopGetCurrent();
+  CFRetain(fseenv->loop);
+  pthread_mutex_unlock(&fseenv->lock);
+  
+  CFRunLoopRun();
+  return NULL;
+}
+#endif
 
 napi_value fse_environment_create(napi_env env)
 {
   fse_environment_t *fseenv = malloc(sizeof(fse_environment_t));
+  
+#if USE_DISPATCH_QUEUE
+  // Use modern dispatch queue approach
   fseenv->queue = dispatch_queue_create("fsevents", DISPATCH_QUEUE_CONCURRENT);
   if (!fseenv->queue)
   {
     free(fseenv);
     return NULL;
   }
-  
+#else
+  // Use legacy CFRunLoop approach
+  fseenv->loop = NULL;
+  fseenv->thread = 0;
   pthread_mutex_init(&fseenv->lock, NULL);
+  
+  if (pthread_create(&fseenv->thread, NULL, fse_thread_start, fseenv) != 0)
+  {
+    pthread_mutex_destroy(&fseenv->lock);
+    free(fseenv);
+    return NULL;
+  }
+  
+  // Wait for the thread to initialize the run loop
+  pthread_mutex_lock(&fseenv->lock);
+  while (!fseenv->loop)
+  {
+    pthread_mutex_unlock(&fseenv->lock);
+    usleep(1000); // Wait 1ms
+    pthread_mutex_lock(&fseenv->lock);
+  }
+  pthread_mutex_unlock(&fseenv->lock);
+#endif
 
   napi_value result;
   CHECK(napi_create_external(env, fseenv, fse_environment_destroy, NULL, &result) == napi_ok);
@@ -89,6 +157,7 @@ typedef struct
   int length;
   fse_event_t *events;
 } fse_events_t;
+
 void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
 {
   fse_instance_t *instance = voidinst;
@@ -96,7 +165,16 @@ void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
   if (instance->stream)
   {
     FSEventStreamStop(instance->stream);
+    
+#if USE_DISPATCH_QUEUE
+    // For dispatch queue approach, invalidate is sufficient
     FSEventStreamInvalidate(instance->stream);
+#else
+    // For CFRunLoop approach, unschedule first
+    FSEventStreamUnscheduleFromRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+    FSEventStreamInvalidate(instance->stream);
+#endif
+    
     FSEventStreamRelease(instance->stream);
     instance->stream = NULL;
   }
@@ -113,6 +191,7 @@ void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
     free(instance);
   }
 }
+
 void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *data)
 {
   if (!env)
@@ -135,6 +214,7 @@ void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *
   free(events->events);
   free(events);
 }
+
 void fse_handle_events(
     ConstFSEventStreamRef stream,
     void *data,
@@ -165,6 +245,7 @@ void fse_handle_events(
   }
   CHECK(napi_call_threadsafe_function(instance->callback, events, napi_tsfn_blocking) == napi_ok);
 }
+
 napi_value FSEStart(napi_env env, napi_callback_info info)
 {
   size_t argc = 4;
@@ -182,8 +263,8 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
   CHECK(napi_get_value_int64(env, argv[2], &since) == napi_ok);
   instance->stream = NULL;
   strncpy(instance->path, path, PATH_MAX);
+  
   napi_value asyncResource, asyncName;
-
   CHECK(napi_create_object(env, &asyncResource) == napi_ok);
   CHECK(napi_create_string_utf8(env, "fsevents", NAPI_AUTO_LENGTH, &asyncName) == napi_ok);
   CHECK(napi_create_threadsafe_function(env, argv[3], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_event, &instance->callback) == napi_ok);
@@ -193,8 +274,15 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
   CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
   instance->stream = FSEventStreamCreate(NULL, &fse_handle_events, &streamcontext, CFArrayCreate(NULL, (const void **)&dirs, 1, NULL), since, (CFAbsoluteTime)0.1, kFSEventStreamCreateFlagNone | kFSEventStreamCreateFlagWatchRoot | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes);
   
-  // Use the new dispatch queue API instead of the deprecated RunLoop API
+  // Schedule the stream using the appropriate method based on SDK version
+#if USE_DISPATCH_QUEUE
+  // Use modern dispatch queue API (macOS 10.10+ SDK)
   FSEventStreamSetDispatchQueue(instance->stream, instance->fseenv->queue);
+#else
+  // Use legacy CFRunLoop API (pre-macOS 10.10 SDK)
+  FSEventStreamScheduleWithRunLoop(instance->stream, instance->fseenv->loop, kCFRunLoopDefaultMode);
+#endif
+  
   FSEventStreamStart(instance->stream);
 
   napi_value result;
@@ -246,6 +334,7 @@ napi_value Init_Constants(napi_env env)
   CONSTANT(ItemCloned);
   return constants;
 }
+
 napi_value Init_Flags(napi_env env)
 {
   napi_value flags, value;
@@ -254,6 +343,7 @@ napi_value Init_Flags(napi_env env)
   CHECK(napi_set_named_property(env, flags, "SinceNow", value) == napi_ok);
   return flags;
 }
+
 napi_value Init(napi_env env, napi_value exports)
 {
   napi_value global = fse_environment_create(env);
