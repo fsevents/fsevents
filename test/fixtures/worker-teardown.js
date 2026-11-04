@@ -21,7 +21,7 @@ if (isMainThread) {
     if (message.phase === "native-event") {
       record({ phase: "fault-requested", mode });
       // The callback itself raises this fault before a parent command is needed.
-      if (mode === "callback-throw") return;
+      if (mode.startsWith("callback-")) return;
       if (mode === "terminate") {
         terminated = worker.terminate();
         terminated.then((code) => record({ phase: "terminate-resolved", code }));
@@ -48,8 +48,13 @@ if (isMainThread) {
   const stop = fsevents.watch(directory, (eventPath, flags, id) => {
     if (!sawEvent && path.resolve(eventPath) === path.join(directory, "native-event")) {
       sawEvent = true;
-      parentPort.postMessage({ phase: "native-event", path: eventPath, flags, id });
+      const event = { phase: "native-event", path: eventPath, flags, id };
+      // Retain callback entry even when the native bug aborts before IPC drains.
+      if (mode.startsWith("callback-")) fs.writeSync(1, JSON.stringify({ ...event, pid: process.pid }) + "\n");
+      else parentPort.postMessage(event);
       if (mode === "callback-throw") throw new Error("fsevents callback regression");
+      if (mode === "callback-exit0") process.exit(0);
+      if (mode === "callback-exit17") process.exit(17);
     }
   });
   parentPort.on("message", async ({ command }) => {

@@ -170,12 +170,25 @@ void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *
     napi_status status = napi_call_function(env, recv, callback, 3, args, &recv);
     if (status == napi_pending_exception)
     {
+      // N-API 4 also returns this status when the environment cannot run JS.
+      bool pending;
+      CHECK(napi_is_exception_pending(env, &pending) == napi_ok);
       napi_value error;
-      CHECK(napi_get_and_clear_last_exception(env, &error) == napi_ok);
+      if (pending) CHECK(napi_get_and_clear_last_exception(env, &error) == napi_ok);
       free(events->events);
       free(events);
-      // Preserve the original asynchronous exception on every supported N-API version.
-      CHECK(napi_fatal_exception(env, error) == napi_ok);
+      // Preserve real exceptions without inventing one during Worker exit.
+      if (pending)
+      {
+        status = napi_fatal_exception(env, error);
+        if (status == napi_pending_exception)
+        {
+          // After clearing the error, this status also represents Worker shutdown.
+          CHECK(napi_is_exception_pending(env, &pending) == napi_ok);
+          CHECK(!pending);
+        }
+        else CHECK(status == napi_ok);
+      }
       return;
     }
     CHECK(status == napi_ok);
