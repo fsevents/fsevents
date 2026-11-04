@@ -31,9 +31,9 @@ jobs:
         file fsevents.node | grep -q arm64 || (echo "arm64 binary not built"; exit 1)
         file fsevents.node | grep -q x86_64 || (echo "x86_64 binary not built"; exit 1)
     - name: Upload binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7.0.2
       with:
-        name: binary
+        name: binary-node-${{ matrix.node-version }}
         path: fsevents.node
       env:
         CI: true
@@ -55,9 +55,9 @@ jobs:
       run: |
         npm install --ignore-scripts
     - name: Download universal binary
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8.0.2
       with:
-        name: binary
+        name: binary-node-${{ matrix.node-version }}
     - name: ensure universal binary (arm64/x86_64)
       run: |
         file fsevents.node

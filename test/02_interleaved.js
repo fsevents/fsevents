@@ -26,15 +26,20 @@ run(async () => {
 
   native.stop(listenerB);
 
+  // FSEvents combines operation and metadata bits. Require each operation,
+  // not incidental metadata accumulated by a particular macOS version.
+  const file = native.constants.ItemIsFile;
   const expected = [
-    [path.join(`${DIR}/A`, "created"), 66816, 80865],
-    [path.join(`${DIR}/B`, "renamed"), 67584, 80888],
-    [path.join(`${DIR}/B`, "renamed"), 68096, 80910],
+    [path.join(`${DIR}/A`, "created"), (native.constants.ItemCreated | file), 80865],
+    [path.join(`${DIR}/B`, "renamed"), (native.constants.ItemRenamed | file), 80888],
+    [path.join(`${DIR}/B`, "renamed"), (native.constants.ItemRemoved | file), 80910],
   ];
+  const incomplete = native.constants.MustScanSubDirs | native.constants.UserDropped | native.constants.KernelDropped;
   assert.equal(events.length, expected.length);
   for (let idx = 0; idx < events.length; idx++) {
     assert.equal(events[idx].length, expected[idx].length);
     assert.equal(events[idx][0], expected[idx][0]);
-    assert.equal(events[idx][1], expected[idx][1]);
+    assert.equal(events[idx][1] & expected[idx][1], expected[idx][1]);
+    assert.equal(events[idx][1] & incomplete, 0);
   }
 });
