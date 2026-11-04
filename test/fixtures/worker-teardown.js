@@ -20,6 +20,8 @@ if (isMainThread) {
     }
     if (message.phase === "native-event") {
       record({ phase: "fault-requested", mode });
+      // The callback itself raises this fault before a parent command is needed.
+      if (mode === "callback-throw") return;
       if (mode === "terminate") {
         terminated = worker.terminate();
         terminated.then((code) => record({ phase: "terminate-resolved", code }));
@@ -34,7 +36,7 @@ if (isMainThread) {
     fs.writeFileSync(receipt, JSON.stringify({ mode, events, workerExit: code }, null, 2) + "\n");
   });
 } else {
-  const { directory, entry, expectedNativeSHA256 } = workerData;
+  const { directory, mode, entry, expectedNativeSHA256 } = workerData;
   const resolved = require.resolve(entry);
   const native = path.join(path.dirname(resolved), "fsevents.node");
   const nativeSHA256 = crypto.createHash("sha256").update(fs.readFileSync(native)).digest("hex");
@@ -47,6 +49,7 @@ if (isMainThread) {
     if (!sawEvent && path.resolve(eventPath) === path.join(directory, "native-event")) {
       sawEvent = true;
       parentPort.postMessage({ phase: "native-event", path: eventPath, flags, id });
+      if (mode === "callback-throw") throw new Error("fsevents callback regression");
     }
   });
   parentPort.on("message", async ({ command }) => {

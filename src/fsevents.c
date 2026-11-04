@@ -167,7 +167,18 @@ void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *
     CHECK(napi_create_int64(env, events->events[idx].id, &args[2]) == napi_ok);
     napi_value recv;
     CHECK(napi_get_null(env, &recv) == napi_ok);
-    CHECK(napi_call_function(env, recv, callback, 3, args, &recv) == napi_ok);
+    napi_status status = napi_call_function(env, recv, callback, 3, args, &recv);
+    if (status == napi_pending_exception)
+    {
+      napi_value error;
+      CHECK(napi_get_and_clear_last_exception(env, &error) == napi_ok);
+      free(events->events);
+      free(events);
+      // Preserve the original asynchronous exception on every supported N-API version.
+      CHECK(napi_fatal_exception(env, error) == napi_ok);
+      return;
+    }
+    CHECK(status == napi_ok);
   }
   free(events->events);
   free(events);

@@ -7,7 +7,7 @@ const directory = path.resolve(process.argv[2]);
 const entry = process.argv[3] || path.resolve(__dirname, "../fsevents.js");
 const evidence = process.argv[4] || directory;
 const expectedNativeSHA256 = crypto.createHash("sha256").update(fs.readFileSync(path.join(path.dirname(require.resolve(entry)), "fsevents.node"))).digest("hex");
-const modes = ["stop", "double-stop", "exit0", "exit17", "throw", "terminate"];
+const modes = ["stop", "double-stop", "exit0", "exit17", "throw", "terminate", "callback-throw"];
 fs.mkdirSync(directory, { recursive: true });
 fs.mkdirSync(evidence, { recursive: true });
 const results = [];
@@ -52,16 +52,16 @@ async function runCase(mode) {
   fs.writeFileSync(path.join(evidence, mode + "-child.json"), JSON.stringify(row, null, 2) + "\n");
   results.push(row);
   const loaded = frames.find((frame) => frame.phase === "native-loaded");
-  const valid = loaded && loaded.nativeSHA256 === expectedNativeSHA256 && loaded.threadId > 0 && frames.some((frame) => frame.phase === "native-event") && frames.some((frame) => frame.phase === "fault-requested");
+  const valid = loaded && loaded.nativeSHA256 === expectedNativeSHA256 && loaded.threadId > 0 && frames.some((frame) => frame.phase === "native-event") && (mode === "callback-throw" || frames.some((frame) => frame.phase === "fault-requested"));
   if (!valid || spawnError || timedOut || parseErrors.length || finalGroupState !== "gone") {
     row.classification = "INVALID_SETUP_OR_OBSERVER";
     return false;
   }
-  const expected = mode === "exit17" ? 17 : mode === "throw" || mode === "terminate" ? 1 : 0;
+  const expected = mode === "exit17" ? 17 : mode === "throw" || mode === "terminate" || mode === "callback-throw" ? 1 : 0;
   const workerExit = frames.find((frame) => frame.phase === "worker-exit");
   const error = frames.find((frame) => frame.phase === "worker-error");
   const stop = frames.find((frame) => frame.phase === "stop-complete");
-  const passed = terminal.code === 0 && terminal.signal === null && workerExit && workerExit.code === expected && (mode !== "throw" || error && error.message === "fsevents teardown regression") && (mode !== "stop" && mode !== "double-stop" || stop && stop.calls === (mode === "stop" ? 1 : 2));
+  const passed = terminal.code === 0 && terminal.signal === null && workerExit && workerExit.code === expected && (mode !== "throw" || error && error.message === "fsevents teardown regression") && (mode !== "callback-throw" || error && error.message === "fsevents callback regression") && (mode !== "stop" && mode !== "double-stop" || stop && stop.calls === (mode === "stop" ? 1 : 2));
   row.classification = passed ? "PASS" : "PRODUCT_FAILURE";
   return true;
 }
