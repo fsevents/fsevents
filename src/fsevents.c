@@ -94,6 +94,8 @@ typedef struct
   fse_environment_t *fseenv;
   FSEventStreamRef stream;
   napi_threadsafe_function callback;
+  napi_env env;
+  int cleanup_registered;
 } fse_instance_t;
 typedef struct
 {
@@ -106,9 +108,17 @@ typedef struct
   int length;
   fse_event_t *events;
 } fse_events_t;
+void fse_instance_cleanup(void *data);
+
 void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
 {
   fse_instance_t *instance = voidinst;
+
+  if (instance->cleanup_registered)
+  {
+    CHECK(napi_remove_env_cleanup_hook(env, fse_instance_cleanup, instance) == napi_ok);
+    instance->cleanup_registered = 0;
+  }
 
   if (instance->stream)
   {
@@ -131,6 +141,15 @@ void fse_instance_destroy(napi_env env, void *voidinst, void *hint)
     free(instance);
   }
 }
+// Cleanup hooks run before independently ordered external/TSFN finalizers.
+void fse_instance_cleanup(void *data)
+{
+  fse_instance_t *instance = data;
+  instance->cleanup_registered = 0;
+  // The external finalizer still owns the instance allocation.
+  fse_instance_destroy(instance->env, instance, instance);
+}
+
 void fse_dispatch_event(napi_env env, napi_value callback, void *context, void *data)
 {
   if (!env)
@@ -190,6 +209,8 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
   CHECK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL) == napi_ok);
 
   fse_instance_t *instance = malloc(sizeof(fse_instance_t));
+  instance->env = env;
+  instance->cleanup_registered = 0;
 
   size_t pathlen = PATH_MAX;
   char path[PATH_MAX];
@@ -206,6 +227,9 @@ napi_value FSEStart(napi_env env, napi_callback_info info)
   CHECK(napi_create_string_utf8(env, "fsevents", NAPI_AUTO_LENGTH, &asyncName) == napi_ok);
   CHECK(napi_create_threadsafe_function(env, argv[3], asyncResource, asyncName, 0, 2, NULL, NULL, NULL, fse_dispatch_event, &instance->callback) == napi_ok);
   CHECK(napi_ref_threadsafe_function(env, instance->callback) == napi_ok);
+  // Added after the TSFN hook so this resource cleanup runs first (LIFO).
+  CHECK(napi_add_env_cleanup_hook(env, fse_instance_cleanup, instance) == napi_ok);
+  instance->cleanup_registered = 1;
 
   FSEventStreamContext streamcontext = {0, instance, NULL, NULL, NULL};
   CFStringRef dirs[] = {CFStringCreateWithCString(NULL, instance->path, kCFStringEncodingUTF8)};
